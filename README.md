@@ -37,6 +37,16 @@ For example:
 [jsvg type="fal" name="jedi" style="margin:2rem" class="fa-10x" title="Obi-Wan Kenobi"]
 ```
 
+You can also use this together with do_shortcode()
+See https://developer.wordpress.org/reference/functions/do_shortcode/ for more information about this.
+
+For example:
+
+```php
+<?php
+echo do_shortcode( '[jsvg type="fas" name="snowboarding" class="fa-4x fa-rotate-270" title="Snowboarding"]' );
+```
+
 ## Changelog ##
 
 ### 1.0.0 ###
