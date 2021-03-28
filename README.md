@@ -1,4 +1,4 @@
-JPKCom Font Awesome (Pro) inline SVG WordPress shortcode plugin
+JPKCom FA inline SVG shortcode plugin
 ===
 
 A plugin for loading inline SVGs from Font Awesome (Pro) using a shortcode.

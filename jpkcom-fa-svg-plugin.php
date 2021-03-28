@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: JPKCom Font Awesome shortcode plugin
+Plugin Name: JPKCom FA inline SVG shortcode plugin
 Plugin URI: https://github.com/JPKCom/jpkcom-fa-svg-plugin
 Description: A plugin for loading inline SVGs from Font Awesome (Pro) using a shortcode
 Version: 1.0.0
