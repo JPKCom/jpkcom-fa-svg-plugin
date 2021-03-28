@@ -27,6 +27,16 @@ Get your Font Awesome or much better your Font Awesome Pro license here: https:/
 5. Make sure that the following files/folders and paths exists: "`fa/css/svg-with-js.min.css`", "`fa/svgs/*`"
 6. Click 'Activate' to use the plugin right away.
 
+## Usage
+
+Use `[jsvg type="" name="" style="" class="" title=""]` in your content or menu item title.
+
+For example:
+
+```
+[jsvg type="fal" name="jedi" style="margin:2rem" class="fa-10x" title="Obi-Wan Kenobi"]
+```
+
 ## Changelog ##
 
 ### 1.0.0 ###
