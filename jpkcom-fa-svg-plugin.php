@@ -134,7 +134,7 @@ function jsvg_code( $atts ) {
 
     }
 
-    // Get file contens
+    // Get file contents
     if( file_exists( $fa_svg_path . $fa_svg_folder . $fa_svg_icon_name ) ) {
 
         $fa_svg_source = file_get_contents( $fa_svg_path . $fa_svg_folder . $fa_svg_icon_name );
