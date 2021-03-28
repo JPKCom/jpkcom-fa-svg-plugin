@@ -1,7 +1,7 @@
 JPKCom Font Awesome (Pro) inline SVG WordPress shortcode plugin
 ===
 
-A plugin to load custom assets, functions and templates into WordPress.
+A plugin for loading inline SVGs from Font Awesome (Pro) using a shortcode.
 
 - Requires at least: 5.7
 - Tested up to: 7.4
