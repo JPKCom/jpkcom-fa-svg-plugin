@@ -64,7 +64,7 @@ add_filter( 'wp_nav_menu_objects', 'jpkcom_fasvg_navigation_fa' );
 
 
 /**
- * Enable shortcode support in menu items.
+ * Add 'jsvg' shortcode.
  */
 function jsvg_code( $atts ) {
 
