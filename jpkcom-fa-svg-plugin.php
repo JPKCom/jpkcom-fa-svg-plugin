@@ -11,7 +11,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 */
 
 if ( ! defined( 'WPINC' ) ) {
-	die;
+    die;
 }
 
 define( 'JPKCOM_FASVG_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
@@ -23,9 +23,11 @@ define( 'JPKCOM_FASVG_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
  */
 if ( ! function_exists( 'jpkcom_fasvg_enqueue_files' ) ) {
 
-	function jpkcom_fasvg_enqueue_files() {
+    function jpkcom_fasvg_enqueue_files() {
 
-		wp_enqueue_style( 'jpkcom-fasvg-style', JPKCOM_FASVG_PLUGIN_URL . 'fa/css/svg-with-js.min.css', array(), '5.15.3', 'all' );
+        wp_enqueue_style( 'jpkcom-fasvg-style', JPKCOM_FASVG_PLUGIN_URL . 'fa/css/svg-with-js.min.css', array(), '5.15.3', 'all' );
+        $jpkcom_fa_inline_css = '.svg-inline--fa{color:inherit;fill:currentColor;}';
+        wp_add_inline_style( 'jpkcom-fasvg-style', $jpkcom_fa_inline_css );
 
 	}
 
