@@ -7,7 +7,7 @@ This is not an official plugin of Font Awesome, nor is it directly affiliated wi
 
 This plugin is intended for users who want to quickly and unbureaucratically integrate the output of the SVG version of Font Awesome, fast and resource-efficient, into their WordPress site.
 
-Get Font Awesome or much better your Font Awesome Pro license here: https://fontawesome.com/
+Get your Font Awesome or much better your Font Awesome Pro license here: https://fontawesome.com/
 
 ## Plugin
 
