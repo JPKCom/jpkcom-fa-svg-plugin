@@ -23,7 +23,7 @@ define( 'JPKCOM_FASVG_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
  */
 if ( ! function_exists( 'jpkcom_fasvg_enqueue_files' ) ) {
 
-	function jpkcom_enqueue_files() {
+	function jpkcom_fasvg_enqueue_files() {
 
 		wp_enqueue_style( 'jpkcom-fasvg-style', JPKCOM_FASVG_PLUGIN_URL . 'fa/css/svg-with-js.min.css', array(), '5.15.3', 'all' );
 
