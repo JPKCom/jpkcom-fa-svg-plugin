@@ -31,3 +31,31 @@ if ( ! function_exists( 'jpkcom_fasvg_enqueue_files' ) ) {
 }
 add_action( 'wp_enqueue_scripts', 'jpkcom_fasvg_enqueue_files' );
 
+/**
+ * Enable shortcode support in menu items.
+ */
+if ( ! function_exists ( 'jpkcom_fasvg_navigation_fa' ) ) {
+
+    function jpkcom_fasvg_navigation_fa( $menu_items ) {
+
+        $jpkcom_fasvg_short_tag = '[jsvg';
+
+        foreach ( $menu_items as $menu_item ) {
+
+            if ( strpos( $menu_item->title, $jpkcom_fasvg_short_tag ) !== false ) {
+
+                $menu_item->title = do_shortcode( $menu_item->title );
+
+            } else {
+
+                $menu_item->title = $menu_item->title;
+
+            }
+
+        }
+
+        return $menu_items;
+
+    }
+}
+add_filter( 'wp_nav_menu_objects', 'jpkcom_fasvg_navigation_fa' );
