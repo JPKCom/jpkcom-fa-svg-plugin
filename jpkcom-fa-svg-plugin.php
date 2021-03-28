@@ -89,7 +89,7 @@ function jsvg_code( $atts ) {
         'jsvg'
     );
 
-    // Type
+    // Folder selection
     if( $atts['type'] != '' ) {
 
         if( $atts['type'] === 'fas' ) {
@@ -120,7 +120,8 @@ function jsvg_code( $atts ) {
 
     }
 
-    if( $atts['name'] != '' ) {
+    // File name selection
+    if( $atts['name'] !== '' ) {
 
         $fa_svg_icon_name = esc_attr( $atts['name'] ) . '.svg';
 
@@ -131,12 +132,14 @@ function jsvg_code( $atts ) {
 
     }
 
+    // Get file contens
     if( file_exists( $fa_svg_path . $fa_svg_folder . $fa_svg_icon_name ) ) {
 
         $fa_svg_source = file_get_contents( $fa_svg_path . $fa_svg_folder . $fa_svg_icon_name );
 
     }
 
+    // Set class attribute
     if( $atts['class'] != '' ) {
 
         $classHTML = ' class="svg-inline--fa fa-' . esc_attr( $atts['name'] ) . ' ' . esc_attr( $atts['class'] ) . '"';
@@ -146,12 +149,14 @@ function jsvg_code( $atts ) {
         $classHTML = ' class="svg-inline--fa fa-' . esc_attr( $atts['name'] ) . '"';
     }
 
+    // Set style attribute
     if( $atts['style'] != '' ) {
 
         $styleHTML = ' style="' . esc_attr( $atts['style'] ) . '"';
 
     }
 
+    // Set SVG title and ARIA label attribute
     if( $atts['title'] != '' ) {
 
         $titleHTML = '<title id="' . $fa_svg_title_id . '">' . esc_attr( $atts['title'] ) . '</title>';
@@ -159,8 +164,10 @@ function jsvg_code( $atts ) {
 
     }
 
+    // Add attributes to SVG
     $fa_svg_source = str_replace('<svg', '<svg' . $classHTML . $fa_svg_attributes . $fa_svg_title_aria . $styleHTML, $fa_svg_source);
 
+    // Add SVG title tag
     if( $atts['title'] != '' ) {
 
         $fa_svg_close_position = strpos( $fa_svg_source, '>' );
@@ -178,7 +185,7 @@ function jsvg_code( $atts ) {
 
     }
 
-    // Code
+    // Return SVG
     return $fa_svg_source;
 
 }
