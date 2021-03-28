@@ -22,7 +22,10 @@ Get your Font Awesome or much better your Font Awesome Pro license here: https:/
 
 1. In your admin panel, go to 'Plugins' > and click the 'Add New' button.
 2. Click Upload Plugin and 'Choose File', then select the Plugin's .zip file. Click 'Install Now'.
-3. Click 'Activate' to use the Plugin right away.
+3. Download your version of Font Awesome (Pro) from https://fontawesome.com/
+4. Unpack/Upload the content of the Font Awesome zip file directly into the plugins folder "fa/"
+5. Make sure that the following files/folders and paths exists: "fa/css/svg-with-js.min.css", "fa/svgs/*"
+6. Click 'Activate' to use the Plugin right away.
 
 ## Changelog ##
 
