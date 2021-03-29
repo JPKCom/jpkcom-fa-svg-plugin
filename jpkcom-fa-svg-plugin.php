@@ -36,6 +36,23 @@ add_action( 'wp_enqueue_scripts', 'jpkcom_fasvg_enqueue_files' );
 
 
 /**
+ * Enqueue block editor assets.
+ */
+if ( ! function_exists( 'jpkcom_fasvg_enqueue_gutenberg_files' ) ) {
+
+    function jpkcom_fasvg_enqueue_gutenberg_files() {
+
+        wp_enqueue_style( 'jpkcom-fasvg-gutenberg-style', JPKCOM_FASVG_PLUGIN_URL . 'fa/css/svg-with-js.min.css', false );
+        $jpkcom_fa_inline_css = '.svg-inline--fa{color:inherit;fill:currentColor;}';
+        wp_add_inline_style( 'jpkcom-fasvg-gutenberg-style', $jpkcom_fa_inline_css );
+
+    }
+
+}
+add_action( 'enqueue_block_editor_assets', 'jpkcom_fasvg_enqueue_gutenberg_files' );
+
+
+/**
  * Enable shortcode support in menu items.
  */
 if ( ! function_exists ( 'jpkcom_fasvg_navigation_fa' ) ) {
