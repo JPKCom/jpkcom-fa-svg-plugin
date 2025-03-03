@@ -1,7 +1,7 @@
 JPKCom FA inline SVG shortcode plugin
 ===
 
-A plugin for loading inline SVGs from Font Awesome (Pro) using a shortcode.
+A plugin for loading inline SVGs from Font Awesome (Pro) v5.15.4 using a shortcode.
 
 This is not an official plugin of Font Awesome, nor is it directly affiliated with Font Awesome or its publisher/owner.
 
@@ -11,9 +11,9 @@ Get your Font Awesome or much better your Font Awesome Pro license here: https:/
 
 ## Plugin
 
-- Requires at least: 5.7
-- Tested up to: 5.7
-- Requires PHP: 7.4
+- Requires at least: WP v6.7+
+- Tested up to: WP v6.7+
+- Requires PHP: v8.3+
 - License: GNU General Public License v2 or later
 - License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,9 +22,9 @@ Get your Font Awesome or much better your Font Awesome Pro license here: https:/
 
 1. In your admin panel, go to 'Plugins' > and click the 'Add New' button.
 2. Click Upload Plugin and 'Choose File', then select the Plugin's .zip file. Click 'Install Now'.
-3. Download your version of Font Awesome (Pro) from https://fontawesome.com/
-4. Unpack/Upload the content of the Font Awesome zip file directly into the plugins folder named "`fa/`"
-5. Make sure that the following files/folders and paths are present: "`fa/css/svg-with-js.min.css`", "`fa/svgs/*`"
+3. Download your version of Font Awesome (Pro) v5.15.4 from https://fontawesome.com/
+4. Unpack/Upload the content of the Font Awesome zip file directly into wp-content/uploads folder named "`jpkcom_fasvg/`"
+5. Make sure that the following files/folders and paths are present: "`wp-content/uploads/jpkcom_fasvg/css/svg-with-js.min.css`", "`wp-content/uploads/jpkcom_fasvg/svgs/*`"
 6. Click 'Activate' to use the plugin right away.
 
 ## Usage
@@ -52,3 +52,8 @@ echo do_shortcode( '[jsvg type="fas" name="snowboarding" class="fa-4x fa-rotate-
 
 ### 1.0.0 ###
 * Initial Release
+
+### 2.0.0 ###
+* PHP 8.3+
+* WP v6.7+
+* wp-content/uploads folder support
