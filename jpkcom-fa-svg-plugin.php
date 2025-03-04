@@ -8,6 +8,7 @@ Author: Jean Pierre Kolb <jpk@jpkc.com>
 Author URI: https://www.jpkc.com/
 Requires at least: 6.7
 Requires PHP: 8.3
+Network: true
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 GitHub Plugin URI: JPKCom/jpkcom-fa-svg-plugin
