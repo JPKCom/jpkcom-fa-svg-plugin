@@ -20,6 +20,7 @@ A plugin for loading inline SVGs from Font Awesome (Pro) v5.15.4 using a shortco
 
 
 ## Description
+
 A plugin for loading inline SVGs from Font Awesome (Pro) v5.15.4 using a shortcode.
 
 This is not an official plugin of Font Awesome, nor is it directly affiliated with Font Awesome or its publisher/owner.
