@@ -1,18 +1,18 @@
 <?php
 /*
-Plugin Name: JPKCom FA inline SVG shortcode plugin
+Plugin Name: JPKCom FA inline SVG shortcode
 Plugin URI: https://github.com/JPKCom/jpkcom-fa-svg-plugin
 Description: A plugin for loading inline SVGs from Font Awesome (Pro) v5.15.4 using a shortcode.
-Version: 2.0.5
+Version: 2.0.6
 Author: Jean Pierre Kolb <jpk@jpkc.com>
 Author URI: https://www.jpkc.com/
 Contributors: JPKCom
-Tags: Font, FA, FontAweseome, SVG, Inline, Shortcode, HTML, A11y, Gutenberg
+Tags: FontAwesome, SVG, Inline, Shortcode, Gutenberg
 Requires at least: 6.7
 Tested up to: 6.7
 Requires PHP: 8.3
 Network: true
-Stable tag: trunk
+Stable tag: 2.0.6
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 GitHub Plugin URI: JPKCom/jpkcom-fa-svg-plugin
@@ -61,7 +61,7 @@ if ( ! function_exists( function: 'jpkcom_fasvg_enqueue_gutenberg_files' ) ) {
 
     function jpkcom_fasvg_enqueue_gutenberg_files(): void {
 
-        wp_enqueue_style( 'jpkcom-fasvg-gutenberg-style', JPKCOM_FASVG_URL . 'css/svg-with-js.min.css', false );
+        wp_enqueue_style( 'jpkcom-fasvg-gutenberg-style', JPKCOM_FASVG_URL . 'css/svg-with-js.min.css', array(), '5.15.4', 'all' );
         $jpkcom_fa_inline_css = '.svg-inline--fa{color:inherit;fill:currentColor;}';
         wp_add_inline_style( 'jpkcom-fasvg-gutenberg-style', $jpkcom_fa_inline_css );
 
@@ -111,7 +111,7 @@ function jsvg_code( $atts ): array|string {
     $fa_svg_path = JPKCOM_FASVG_PATH . 'svgs/';
     $fa_svg_folder = 'solid/';
     $fa_svg_icon_name = 'square-full.svg';
-    $fa_svg_title_id = 'svg-title-' . mt_rand( min: 10, max: 500000 );
+    $fa_svg_title_id = 'svg-title-' . wp_rand( min: 10, max: 500000 );
     $fa_svg_title_aria = ' aria-hidden="true"';
     $fa_svg_attributes = ' role="img"';
     $fa_svg_source = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M512 512H0V0h512v512z"/></svg>';

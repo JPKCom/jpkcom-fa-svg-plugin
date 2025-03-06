@@ -1,18 +1,18 @@
-# JPKCom FA inline SVG shortcode plugin
+# JPKCom FA inline SVG shortcode
 
-**Plugin Name:** JPKCom FA inline SVG shortcode plugin  
+**Plugin Name:** JPKCom FA inline SVG shortcode  
 **Plugin URI:** https://github.com/JPKCom/jpkcom-fa-svg-plugin  
 **Description:** A plugin for loading inline SVGs from Font Awesome (Pro) v5.15.4 using a shortcode  
-**Version:** 2.0.5  
+**Version:** 2.0.6  
 **Author:** Jean Pierre Kolb <jpk@jpkc.com>  
 **Author URI:** https://www.jpkc.com/  
 **Contributors:** JPKCom  
-**Tags:** Font, FA, FontAweseome, SVG, Inline, Shortcode, HTML, A11y, Gutenberg  
+**Tags:** FontAwesome, SVG, Inline, Shortcode, Gutenberg  
 **Requires at least:** 6.7  
 **Tested up to:** 6.7  
 **Requires PHP:** 8.3  
 **Network:** true  
-**Stable tag:** trunk  
+**Stable tag:** 2.0.6  
 **License:** GPL-2.0+  
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -65,6 +65,10 @@ echo do_shortcode( '[jsvg type="fas" name="snowboarding" class="fa-4x fa-rotate-
 
 
 ## Changelog
+
+### 2.0.6
+* Making use of wp_rand()
+* Fix Stable tag
 
 ### 2.0.5
 * README.md version update
