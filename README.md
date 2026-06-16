@@ -71,6 +71,7 @@ echo do_shortcode( '[jsvg type="fas" name="snowboarding" class="fa-4x fa-rotate-
 * Added an automated release workflow (builds the ZIP, generates the manifest and deploys to gh-pages on tag push)
 * Raised the minimum WordPress version to 6.9 and "Tested up to" to WordPress 7.0
 * Switched license metadata to the SPDX identifier `GPL-2.0-or-later` with the HTTPS license URI
+* Added PHPDoc-generated API documentation, built and deployed to gh-pages on release
 
 ### 2.0.8
 * PHP warnings fixed "Undefined variable ..."

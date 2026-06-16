@@ -24,6 +24,8 @@ if ( ! defined( constant_name: 'WPINC' ) ) {
 
 /**
  * Plugin Constants
+ *
+ * @since 2.0.9
  */
 if ( ! defined( 'JPKCOM_FASVG_VERSION' ) ) {
     define( 'JPKCOM_FASVG_VERSION', '2.0.9' );
@@ -34,6 +36,10 @@ if ( ! defined( 'JPKCOM_FASVG_VERSION' ) ) {
  * Initialize Plugin Updater
  *
  * Loads and initializes the GitHub-based plugin updater with SHA256 checksum verification.
+ *
+ * @since 2.0.9
+ *
+ * @return void
  */
 add_action( 'init', static function (): void {
     $updater_file = plugin_dir_path( __FILE__ ) . 'includes/class-plugin-updater.php';
@@ -51,6 +57,11 @@ add_action( 'init', static function (): void {
     }
 }, 5 );
 
+/**
+ * Plugin path, URL and Font Awesome upload directory constants.
+ *
+ * @since 1.0.0
+ */
 define( constant_name: 'JPKCOM_FASVG_PLUGIN_PATH', value: plugin_dir_path( __FILE__ ) );
 define( constant_name: 'JPKCOM_FASVG_PLUGIN_URL', value: plugin_dir_url( __FILE__ ) );
 
@@ -65,7 +76,11 @@ $jpkcom_fasvg_url = $jpkcom_fasvg_upload_url['baseurl'] . '/jpkcom_fasvg/';
 define( constant_name: 'JPKCOM_FASVG_URL', value: $jpkcom_fasvg_url );
 
 /**
- * Enqueue needed Font Awesome styles in head.
+ * Enqueue the Font Awesome inline-SVG stylesheet on the front end.
+ *
+ * @since 1.0.0
+ *
+ * @return void
  */
 if ( ! function_exists( function: 'jpkcom_fasvg_enqueue_files' ) ) {
 
@@ -83,7 +98,11 @@ add_action( 'wp_enqueue_scripts', 'jpkcom_fasvg_enqueue_files' );
 
 
 /**
- * Enqueue block editor assets.
+ * Enqueue the Font Awesome inline-SVG stylesheet in the block editor.
+ *
+ * @since 1.0.0
+ *
+ * @return void
  */
 if ( ! function_exists( function: 'jpkcom_fasvg_enqueue_gutenberg_files' ) ) {
 
@@ -101,7 +120,12 @@ add_action( 'enqueue_block_editor_assets', 'jpkcom_fasvg_enqueue_gutenberg_files
 
 
 /**
- * Enable shortcode support in menu items.
+ * Run shortcodes contained in navigation menu item titles.
+ *
+ * @since 1.0.0
+ *
+ * @param array $menu_items The navigation menu item objects.
+ * @return mixed The menu items with shortcodes in their titles expanded.
  */
 if ( ! function_exists ( function: 'jpkcom_fasvg_navigation_fa' ) ) {
 
@@ -132,7 +156,19 @@ add_filter( 'wp_nav_menu_objects', 'jpkcom_fasvg_navigation_fa' );
 
 
 /**
- * Add 'jsvg' shortcode.
+ * Render the [jsvg] shortcode as an inline Font Awesome SVG.
+ *
+ * Supported attributes:
+ * - type:  Font Awesome style folder (fas, fal, far, fad, fab). Default 'fas'.
+ * - name:  Icon file name without extension. Default 'square-full'.
+ * - class: Additional CSS classes for the <svg> element.
+ * - style: Inline CSS for the <svg> element.
+ * - title: Accessible title; sets aria-labelledby and a <title> element.
+ *
+ * @since 1.0.0
+ *
+ * @param array $atts Shortcode attributes.
+ * @return array|string The inline SVG markup.
  */
 function jsvg_code( $atts ): array|string {
 
