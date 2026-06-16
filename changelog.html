@@ -1,0 +1,62 @@
+<h3 id="section">2.0.9</h3>
+<ul>
+<li>Added secure self-hosted plugin updates via GitHub with SHA256
+checksum verification</li>
+<li>Added an automated release workflow (builds the ZIP, generates the
+manifest and deploys to gh-pages on tag push)</li>
+<li>Raised the minimum WordPress version to 6.9 and “Tested up to” to
+WordPress 7.0</li>
+<li>Switched license metadata to the SPDX identifier
+<code>GPL-2.0-or-later</code> with the HTTPS license URI</li>
+<li>Added PHPDoc-generated API documentation, built and deployed to
+gh-pages on release</li>
+<li>Security: prevented path traversal in the <code>[jsvg]</code>
+<code>name</code> attribute (now sanitized with
+<code>sanitize_file_name()</code>/<code>basename()</code>)</li>
+<li>Hardening: enabled <code>declare(strict_types=1)</code>, tightened
+parameter/return types, guarded the SVG file read and removed dead
+code</li>
+</ul>
+<h3 id="section-1">2.0.8</h3>
+<ul>
+<li>PHP warnings fixed “Undefined variable …”</li>
+</ul>
+<h3 id="section-2">2.0.7</h3>
+<ul>
+<li>Tested up to WP v6.8</li>
+</ul>
+<h3 id="section-3">2.0.6</h3>
+<ul>
+<li>Making use of wp_rand()</li>
+<li>Fix Stable tag</li>
+</ul>
+<h3 id="section-4">2.0.5</h3>
+<ul>
+<li>README.md version update</li>
+</ul>
+<h3 id="section-5">2.0.4</h3>
+<ul>
+<li>README.md meta data update</li>
+</ul>
+<h3 id="section-6">2.0.3</h3>
+<ul>
+<li>Plugin meta data update</li>
+</ul>
+<h3 id="section-7">2.0.2</h3>
+<ul>
+<li>README.md update</li>
+</ul>
+<h3 id="section-8">2.0.1</h3>
+<ul>
+<li>Network support</li>
+</ul>
+<h3 id="section-9">2.0.0</h3>
+<ul>
+<li>PHP 8.3+</li>
+<li>WP v6.7+</li>
+<li>wp-content/uploads folder support</li>
+</ul>
+<h3 id="section-10">1.0.0</h3>
+<ul>
+<li>Initial Release</li>
+</ul>
