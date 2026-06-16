@@ -3,18 +3,18 @@
 **Plugin Name:** JPKCom FA inline SVG shortcode  
 **Plugin URI:** https://github.com/JPKCom/jpkcom-fa-svg-plugin  
 **Description:** A plugin for loading inline SVGs from Font Awesome (Pro) v5.15.4 using a shortcode  
-**Version:** 2.0.8  
+**Version:** 2.0.9  
 **Author:** Jean Pierre Kolb <jpk@jpkc.com>  
 **Author URI:** https://www.jpkc.com/  
 **Contributors:** JPKCom  
 **Tags:** FontAwesome, SVG, Inline, Shortcode, Gutenberg  
-**Requires at least:** 6.7  
-**Tested up to:** 6.8  
+**Requires at least:** 6.9  
+**Tested up to:** 7.0  
 **Requires PHP:** 8.3  
 **Network:** true  
-**Stable tag:** 2.0.8  
-**License:** GPL-2.0+  
-**License URI:** http://www.gnu.org/licenses/gpl-2.0.txt
+**Stable tag:** 2.0.9  
+**License:** GPL-2.0-or-later  
+**License URI:** https://www.gnu.org/licenses/gpl-2.0.html
 
 A plugin for loading inline SVGs from Font Awesome (Pro) v5.15.4 using a shortcode.
 
@@ -65,6 +65,12 @@ echo do_shortcode( '[jsvg type="fas" name="snowboarding" class="fa-4x fa-rotate-
 
 
 ## Changelog
+
+### 2.0.9
+* Added secure self-hosted plugin updates via GitHub with SHA256 checksum verification
+* Added an automated release workflow (builds the ZIP, generates the manifest and deploys to gh-pages on tag push)
+* Raised the minimum WordPress version to 6.9 and "Tested up to" to WordPress 7.0
+* Switched license metadata to the SPDX identifier `GPL-2.0-or-later` with the HTTPS license URI
 
 ### 2.0.8
 * PHP warnings fixed "Undefined variable ..."

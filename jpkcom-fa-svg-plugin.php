@@ -3,25 +3,53 @@
 Plugin Name: JPKCom FA inline SVG shortcode
 Plugin URI: https://github.com/JPKCom/jpkcom-fa-svg-plugin
 Description: A plugin for loading inline SVGs from Font Awesome (Pro) v5.15.4 using a shortcode.
-Version: 2.0.8
+Version: 2.0.9
 Author: Jean Pierre Kolb <jpk@jpkc.com>
 Author URI: https://www.jpkc.com/
 Contributors: JPKCom
 Tags: FontAwesome, SVG, Inline, Shortcode, Gutenberg
-Requires at least: 6.7
-Tested up to: 6.8
+Requires at least: 6.9
+Tested up to: 7.0
 Requires PHP: 8.3
 Network: true
-Stable tag: 2.0.8
-License: GPL-2.0+
-License URI: http://www.gnu.org/licenses/gpl-2.0.txt
-GitHub Plugin URI: JPKCom/jpkcom-fa-svg-plugin
-Primary Branch: main
+Stable tag: 2.0.9
+License: GPL-2.0-or-later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 */
 
 if ( ! defined( constant_name: 'WPINC' ) ) {
     die;
 }
+
+
+/**
+ * Plugin Constants
+ */
+if ( ! defined( 'JPKCOM_FASVG_VERSION' ) ) {
+    define( 'JPKCOM_FASVG_VERSION', '2.0.9' );
+}
+
+
+/**
+ * Initialize Plugin Updater
+ *
+ * Loads and initializes the GitHub-based plugin updater with SHA256 checksum verification.
+ */
+add_action( 'init', static function (): void {
+    $updater_file = plugin_dir_path( __FILE__ ) . 'includes/class-plugin-updater.php';
+
+    if ( file_exists( $updater_file ) ) {
+        require_once $updater_file;
+
+        if ( class_exists( 'JPKComFaSvgPluginGitUpdate\\JPKComGitPluginUpdater' ) ) {
+            new \JPKComFaSvgPluginGitUpdate\JPKComGitPluginUpdater(
+                plugin_file: __FILE__,
+                current_version: JPKCOM_FASVG_VERSION,
+                manifest_url: 'https://jpkcom.github.io/jpkcom-fa-svg-plugin/plugin_jpkcom-fa-svg-plugin.json'
+            );
+        }
+    }
+}, 5 );
 
 define( constant_name: 'JPKCOM_FASVG_PLUGIN_PATH', value: plugin_dir_path( __FILE__ ) );
 define( constant_name: 'JPKCOM_FASVG_PLUGIN_URL', value: plugin_dir_url( __FILE__ ) );
