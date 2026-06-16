@@ -99,7 +99,7 @@ shortcode</h1>
 https://github.com/JPKCom/jpkcom-fa-svg-plugin<br />
 <strong>Description:</strong> A plugin for loading inline SVGs from Font
 Awesome (Pro) v5.15.4 using a shortcode<br />
-<strong>Version:</strong> 2.0.9<br />
+<strong>Version:</strong> 2.0.10<br />
 <strong>Author:</strong> Jean Pierre Kolb <a href="mailto:jpk@jpkc.com"
 class="email">jpk@jpkc.com</a><br />
 <strong>Author URI:</strong> https://www.jpkc.com/<br />
@@ -110,7 +110,7 @@ Gutenberg<br />
 <strong>Tested up to:</strong> 7.0<br />
 <strong>Requires PHP:</strong> 8.3<br />
 <strong>Network:</strong> true<br />
-<strong>Stable tag:</strong> 2.0.9<br />
+<strong>Stable tag:</strong> 2.0.10<br />
 <strong>License:</strong> GPL-2.0-or-later<br />
 <strong>License URI:</strong>
 https://www.gnu.org/licenses/gpl-2.0.html</p>
@@ -126,6 +126,10 @@ unbureaucratically integrate the output of the SVG version of Font
 Awesome, fast and resource-efficient, into their WordPress site.</p>
 <p>Get your Font Awesome or much better your Font Awesome Pro license
 here: https://fontawesome.com/</p>
+<h3 id="documentation">Documentation</h3>
+<p><strong>API Documentation:</strong> Complete PHPDoc-generated API
+documentation is available at: <a
+href="https://jpkcom.github.io/jpkcom-fa-svg-plugin/docs/">https://jpkcom.github.io/jpkcom-fa-svg-plugin/docs/</a></p>
 <h2 id="installation">Installation</h2>
 <ol type="1">
 <li>In your admin panel, go to ‘Plugins’ &gt; and click the ‘Add New’
@@ -141,7 +145,7 @@ wp-content/uploads folder named “<code>jpkcom_fasvg/</code>”</li>
 “<code>wp-content/uploads/jpkcom_fasvg/svgs/*</code>”</li>
 <li>Click ‘Activate’ to use the plugin right away.</li>
 </ol>
-<h2 id="frequently-asked-questions">Frequently Asked Questions</h2>
+<h2 id="faq">FAQ</h2>
 <h3 id="usage">Usage</h3>
 <p>Use <code>[jsvg type="" name="" style="" class="" title=""]</code> in
 your content or menu item title.</p>
@@ -155,7 +159,12 @@ for more information about this.</p>
 class="sourceCode php"><code class="sourceCode php"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;?php</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">echo</span> do_shortcode( <span class="st">&#39;[jsvg type=&quot;fas&quot; name=&quot;snowboarding&quot; class=&quot;fa-4x fa-rotate-270&quot; title=&quot;Snowboarding&quot;]&#39;</span> )<span class="ot">;</span></span></code></pre></div>
 <h2 id="changelog">Changelog</h2>
-<h3 id="section">2.0.9</h3>
+<h3 id="section">2.0.10</h3>
+<ul>
+<li>Docs: corrected the FAQ section heading so it is included in the
+release manifest, and linked the published PHPDoc API documentation</li>
+</ul>
+<h3 id="section-1">2.0.9</h3>
 <ul>
 <li>Added secure self-hosted plugin updates via GitHub with SHA256
 checksum verification</li>
@@ -174,46 +183,46 @@ gh-pages on release</li>
 parameter/return types, guarded the SVG file read and removed dead
 code</li>
 </ul>
-<h3 id="section-1">2.0.8</h3>
+<h3 id="section-2">2.0.8</h3>
 <ul>
 <li>PHP warnings fixed “Undefined variable …”</li>
 </ul>
-<h3 id="section-2">2.0.7</h3>
+<h3 id="section-3">2.0.7</h3>
 <ul>
 <li>Tested up to WP v6.8</li>
 </ul>
-<h3 id="section-3">2.0.6</h3>
+<h3 id="section-4">2.0.6</h3>
 <ul>
 <li>Making use of wp_rand()</li>
 <li>Fix Stable tag</li>
 </ul>
-<h3 id="section-4">2.0.5</h3>
+<h3 id="section-5">2.0.5</h3>
 <ul>
 <li>README.md version update</li>
 </ul>
-<h3 id="section-5">2.0.4</h3>
+<h3 id="section-6">2.0.4</h3>
 <ul>
 <li>README.md meta data update</li>
 </ul>
-<h3 id="section-6">2.0.3</h3>
+<h3 id="section-7">2.0.3</h3>
 <ul>
 <li>Plugin meta data update</li>
 </ul>
-<h3 id="section-7">2.0.2</h3>
+<h3 id="section-8">2.0.2</h3>
 <ul>
 <li>README.md update</li>
 </ul>
-<h3 id="section-8">2.0.1</h3>
+<h3 id="section-9">2.0.1</h3>
 <ul>
 <li>Network support</li>
 </ul>
-<h3 id="section-9">2.0.0</h3>
+<h3 id="section-10">2.0.0</h3>
 <ul>
 <li>PHP 8.3+</li>
 <li>WP v6.7+</li>
 <li>wp-content/uploads folder support</li>
 </ul>
-<h3 id="section-10">1.0.0</h3>
+<h3 id="section-11">1.0.0</h3>
 <ul>
 <li>Initial Release</li>
 </ul>

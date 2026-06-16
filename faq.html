@@ -1,1 +1,12 @@
-
+<h3 id="usage">Usage</h3>
+<p>Use <code>[jsvg type="" name="" style="" class="" title=""]</code> in
+your content or menu item title.</p>
+<p><strong>For example:</strong></p>
+<pre><code>[jsvg type=&quot;fal&quot; name=&quot;jedi&quot; style=&quot;margin:2rem&quot; class=&quot;fa-10x&quot; title=&quot;Obi-Wan Kenobi&quot;]</code></pre>
+<p>You can also use this together with <code>do_shortcode()</code>.</p>
+<p>See https://developer.wordpress.org/reference/functions/do_shortcode/
+for more information about this.</p>
+<p><strong>For example:</strong></p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode php"><code class="sourceCode php"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;?php</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">echo</span> do_shortcode( <span class="st">&#39;[jsvg type=&quot;fas&quot; name=&quot;snowboarding&quot; class=&quot;fa-4x fa-rotate-270&quot; title=&quot;Snowboarding&quot;]&#39;</span> )<span class="ot">;</span></span></code></pre></div>

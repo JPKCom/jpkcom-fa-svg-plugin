@@ -3,7 +3,7 @@
 **Plugin Name:** JPKCom FA inline SVG shortcode  
 **Plugin URI:** https://github.com/JPKCom/jpkcom-fa-svg-plugin  
 **Description:** A plugin for loading inline SVGs from Font Awesome (Pro) v5.15.4 using a shortcode  
-**Version:** 2.0.9  
+**Version:** 2.0.10  
 **Author:** Jean Pierre Kolb <jpk@jpkc.com>  
 **Author URI:** https://www.jpkc.com/  
 **Contributors:** JPKCom  
@@ -12,7 +12,7 @@
 **Tested up to:** 7.0  
 **Requires PHP:** 8.3  
 **Network:** true  
-**Stable tag:** 2.0.9  
+**Stable tag:** 2.0.10  
 **License:** GPL-2.0-or-later  
 **License URI:** https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -30,6 +30,12 @@ This plugin is intended for users who want to quickly and unbureaucratically int
 Get your Font Awesome or much better your Font Awesome Pro license here: https://fontawesome.com/
 
 
+### Documentation
+
+**API Documentation:** Complete PHPDoc-generated API documentation is available at:
+[https://jpkcom.github.io/jpkcom-fa-svg-plugin/docs/](https://jpkcom.github.io/jpkcom-fa-svg-plugin/docs/)
+
+
 ## Installation
 
 1. In your admin panel, go to 'Plugins' > and click the 'Add New' button.
@@ -40,7 +46,7 @@ Get your Font Awesome or much better your Font Awesome Pro license here: https:/
 6. Click 'Activate' to use the plugin right away.
 
 
-## Frequently Asked Questions
+## FAQ
 
 ### Usage
 
@@ -65,6 +71,9 @@ echo do_shortcode( '[jsvg type="fas" name="snowboarding" class="fa-4x fa-rotate-
 
 
 ## Changelog
+
+### 2.0.10
+* Docs: corrected the FAQ section heading so it is included in the release manifest, and linked the published PHPDoc API documentation
 
 ### 2.0.9
 * Added secure self-hosted plugin updates via GitHub with SHA256 checksum verification
