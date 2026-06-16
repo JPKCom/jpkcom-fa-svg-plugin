@@ -72,6 +72,8 @@ echo do_shortcode( '[jsvg type="fas" name="snowboarding" class="fa-4x fa-rotate-
 * Raised the minimum WordPress version to 6.9 and "Tested up to" to WordPress 7.0
 * Switched license metadata to the SPDX identifier `GPL-2.0-or-later` with the HTTPS license URI
 * Added PHPDoc-generated API documentation, built and deployed to gh-pages on release
+* Security: prevented path traversal in the `[jsvg]` `name` attribute (now sanitized with `sanitize_file_name()`/`basename()`)
+* Hardening: enabled `declare(strict_types=1)`, tightened parameter/return types, guarded the SVG file read and removed dead code
 
 ### 2.0.8
 * PHP warnings fixed "Undefined variable ..."

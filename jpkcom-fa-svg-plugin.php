@@ -17,6 +17,8 @@ License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 */
 
+declare(strict_types=1);
+
 if ( ! defined( constant_name: 'WPINC' ) ) {
     die;
 }
@@ -65,15 +67,14 @@ add_action( 'init', static function (): void {
 define( constant_name: 'JPKCOM_FASVG_PLUGIN_PATH', value: plugin_dir_path( __FILE__ ) );
 define( constant_name: 'JPKCOM_FASVG_PLUGIN_URL', value: plugin_dir_url( __FILE__ ) );
 
-$jpkcom_fasvg_upload_dir = wp_upload_dir();
-$jpkcom_fasvg_path = $jpkcom_fasvg_upload_dir['basedir'] . '/jpkcom_fasvg/';
+( static function (): void {
 
-define( constant_name: 'JPKCOM_FASVG_PATH', value: $jpkcom_fasvg_path );
+    $jpkcom_fasvg_upload = wp_upload_dir();
 
-$jpkcom_fasvg_upload_url = wp_upload_dir();
-$jpkcom_fasvg_url = $jpkcom_fasvg_upload_url['baseurl'] . '/jpkcom_fasvg/';
+    define( constant_name: 'JPKCOM_FASVG_PATH', value: $jpkcom_fasvg_upload['basedir'] . '/jpkcom_fasvg/' );
+    define( constant_name: 'JPKCOM_FASVG_URL', value: $jpkcom_fasvg_upload['baseurl'] . '/jpkcom_fasvg/' );
 
-define( constant_name: 'JPKCOM_FASVG_URL', value: $jpkcom_fasvg_url );
+} )();
 
 /**
  * Enqueue the Font Awesome inline-SVG stylesheet on the front end.
@@ -125,11 +126,11 @@ add_action( 'enqueue_block_editor_assets', 'jpkcom_fasvg_enqueue_gutenberg_files
  * @since 1.0.0
  *
  * @param array $menu_items The navigation menu item objects.
- * @return mixed The menu items with shortcodes in their titles expanded.
+ * @return array The menu items with shortcodes in their titles expanded.
  */
-if ( ! function_exists ( function: 'jpkcom_fasvg_navigation_fa' ) ) {
+if ( ! function_exists( function: 'jpkcom_fasvg_navigation_fa' ) ) {
 
-    function jpkcom_fasvg_navigation_fa( $menu_items ): mixed {
+    function jpkcom_fasvg_navigation_fa( array $menu_items ): array {
 
         $jpkcom_fasvg_short_tag = '[jsvg';
 
@@ -138,10 +139,6 @@ if ( ! function_exists ( function: 'jpkcom_fasvg_navigation_fa' ) ) {
             if ( strpos( haystack: $menu_item->title, needle: $jpkcom_fasvg_short_tag ) !== false ) {
 
                 $menu_item->title = do_shortcode( $menu_item->title );
-
-            } else {
-
-                $menu_item->title = $menu_item->title;
 
             }
 
@@ -167,10 +164,10 @@ add_filter( 'wp_nav_menu_objects', 'jpkcom_fasvg_navigation_fa' );
  *
  * @since 1.0.0
  *
- * @param array $atts Shortcode attributes.
- * @return array|string The inline SVG markup.
+ * @param array<string, string>|string $atts Shortcode attributes ( empty string when none are supplied ).
+ * @return string The inline SVG markup.
  */
-function jsvg_code( $atts ): array|string {
+function jsvg_code( $atts ): string {
 
     $fa_svg_path = JPKCOM_FASVG_PATH . 'svgs/';
     $fa_svg_folder = 'solid/';
@@ -230,7 +227,7 @@ function jsvg_code( $atts ): array|string {
     // File name selection
     if( $atts['name'] !== '' ) {
 
-        $fa_svg_icon_name = esc_attr( $atts['name'] ) . '.svg';
+        $fa_svg_icon_name = sanitize_file_name( basename( $atts['name'] ) ) . '.svg';
 
     } else {
 
@@ -240,9 +237,17 @@ function jsvg_code( $atts ): array|string {
     }
 
     // Get file contents
-    if( file_exists( filename: $fa_svg_path . $fa_svg_folder . $fa_svg_icon_name ) ) {
+    $fa_svg_file = $fa_svg_path . $fa_svg_folder . $fa_svg_icon_name;
 
-        $fa_svg_source = file_get_contents( filename: $fa_svg_path . $fa_svg_folder . $fa_svg_icon_name );
+    if ( file_exists( filename: $fa_svg_file ) ) {
+
+        $fa_svg_contents = file_get_contents( filename: $fa_svg_file );
+
+        if ( false !== $fa_svg_contents ) {
+
+            $fa_svg_source = $fa_svg_contents;
+
+        }
 
     }
 
