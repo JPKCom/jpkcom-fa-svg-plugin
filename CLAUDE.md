@@ -39,7 +39,7 @@ Main file (jpkcom-fa-svg-plugin.php)
 
 | Constant | Value | Purpose |
 |----------|-------|---------|
-| `JPKCOM_FASVG_VERSION` | `'2.0.9'` | Plugin version (kept in sync with header/README/phpdoc.xml) |
+| `JPKCOM_FASVG_VERSION` | `'2.0.11'` | Plugin version (kept in sync with header/README/phpdoc.xml) |
 | `JPKCOM_FASVG_PLUGIN_PATH` | `plugin_dir_path(__FILE__)` | Absolute plugin path |
 | `JPKCOM_FASVG_PLUGIN_URL` | `plugin_dir_url(__FILE__)` | Plugin URL |
 | `JPKCOM_FASVG_PATH` | `<uploads>/jpkcom_fasvg/` | Filesystem base for CSS + SVGs |
@@ -86,12 +86,26 @@ jpkcom-fa-svg-plugin/
 
 - **Namespace:** `JPKComFaSvgPluginGitUpdate\JPKComGitPluginUpdater`
 - **Manifest URL:** `https://jpkcom.github.io/jpkcom-fa-svg-plugin/plugin_jpkcom-fa-svg-plugin.json`
-- Shared JPKCom updater (do **not** edit per-plugin; it is a downstream copy of the upstream `jpkcom-post-filter` updater). Features: SHA256 checksum verification (`upgrader_pre_download`), `wp_safe_remote_get()` manifest fetch, `wp_http_validate_url()` on every URL, 30 s race-condition lock, 24 h transient cache, timing-safe `hash_equals()` comparison.
+- Shared JPKCom updater (do **not** edit per-plugin; it is a downstream copy of the upstream `jpkcom-post-filter` updater). Features: SHA256 checksum verification (`upgrader_pre_download`), `wp_safe_remote_get()` manifest fetch, `wp_http_validate_url()` on every URL, 30 s race-condition lock, 24 h transient cache, timing-safe `hash_equals()` comparison. Checksum verification is **mandatory**: a missing or unfetchable `checksum_sha256` aborts the update instead of installing unverified code. The verified temp file is returned from `upgrader_pre_download`, so WordPress installs exactly the bytes that were hashed (no second download). Failed manifest fetches are negatively cached for 1 h.
 - Hooks: `plugins_api`, `site_transient_update_plugins`, `upgrader_process_complete`, `upgrader_pre_download`.
 
 ---
 
 ## Release Workflow
+
+**Supply-chain: GitHub Actions sind auf Commit-SHAs gepinnt.** Alle `uses:`-Zeilen in `.github/workflows/` referenzieren einen 40-stelligen Commit-SHA statt eines Tags (`@v4`), mit der Version als Kommentar dahinter. Grund: ein Tag ist ein beweglicher Zeiger und lässt sich umhängen, ein SHA nicht. Da dieser Workflow die Plugin-ZIP **und** die SHA256-Summe erzeugt, der der Auto-Updater vertraut, würde eine kompromittierte Action ein manipuliertes ZIP samt passender Prüfsumme ausliefern — die Prüfsumme sichert den Transportweg, das Pinning den Build. `.github/dependabot.yml` hält die Pins wöchentlich aktuell (ein gesammelter PR). Beim Aktualisieren immer SHA *und* Versionskommentar zusammen ändern.
+
+**CI & Dependabot-Auto-Merge.** Zwei zusätzliche Workflows:
+
+- `.github/workflows/ci.yml` — läuft auf jedem `pull_request`. Prüft: `php -l` über alle PHP-Dateien; ungültige benannte Argumente an internen PHP-Funktionen (fängt die Klasse `sprintf(format:, values:)` → `ArgumentCountError`, die `php -l` nicht sieht); YAML-Validität aller `.github`-Dateien; und dass jede Action auf einem 40-stelligen Commit-SHA gepinnt ist (beide YAML-Formen, `uses:` und `- uses:`).
+- `.github/workflows/dependabot-auto-merge.yml` — merged Dependabot-PRs automatisch, aber nur `semver-patch` und `semver-minor`. Major-Updates bekommen stattdessen einen Kommentar und bleiben manuell. Greift nur bei PRs von `dependabot[bot]` aus diesem Repo, nie aus Forks.
+
+> **Zwei Repo-Einstellungen sind Voraussetzung, sonst ist der Auto-Merge wirkungslos oder gefährlich:**
+> 1. **„Allow auto-merge"** muss in den Repo-Settings aktiv sein.
+> 2. Der Branch-Schutz muss den CI-Job als **Required status check** führen (`CI / Lint & Guards`). Fehlt das, merged `gh pr merge --auto` **sofort** — es gibt dann nichts, worauf es warten müsste, und die CI wäre reine Dekoration.
+
+Zusammen mit `cooldown: default-days: 7` in der `dependabot.yml` heißt das: kein Action-Release wird in seiner ersten Woche übernommen, patch/minor laufen danach automatisch durch (sofern CI grün), major bleibt eine bewusste Entscheidung.
+
 
 Triggered by **pushing a `v*` tag** (`.github/workflows/release.yml`). The workflow creates the GitHub release itself — no manual "Publish release" step needed. Pipeline: setup PHP 8.3 + Python + Pandoc + GraphViz → extract README metadata → build slug-named ZIP → SHA256 → upload ZIP + `.sha256` → generate `plugin_<slug>.json` manifest → generate PHPDoc → deploy manifest/HTML/docs to `gh-pages`.
 
