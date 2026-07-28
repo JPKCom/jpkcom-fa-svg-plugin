@@ -39,7 +39,7 @@ Main file (jpkcom-fa-svg-plugin.php)
 
 | Constant | Value | Purpose |
 |----------|-------|---------|
-| `JPKCOM_FASVG_VERSION` | `'2.0.11'` | Plugin version (kept in sync with header/README/phpdoc.xml) |
+| `JPKCOM_FASVG_VERSION` | `'2.0.12'` | Plugin version (kept in sync with header/README/phpdoc.xml) |
 | `JPKCOM_FASVG_PLUGIN_PATH` | `plugin_dir_path(__FILE__)` | Absolute plugin path |
 | `JPKCOM_FASVG_PLUGIN_URL` | `plugin_dir_url(__FILE__)` | Plugin URL |
 | `JPKCOM_FASVG_PATH` | `<uploads>/jpkcom_fasvg/` | Filesystem base for CSS + SVGs |
