@@ -1,7 +1,7 @@
 {
   "Author": "Jean Pierre Kolb <jpk@jpkc.com>",
   "APIDocumentation": "Complete PHPDoc-generated API documentation is available at",
-  "Version": "2.0.12",
+  "Version": "2.0.13",
   "Description": "A plugin for loading inline SVGs from Font Awesome (Pro) v5.15.4 using a shortcode",
   "PluginURI": "https://github.com/JPKCom/jpkcom-fa-svg-plugin",
   "PluginName": "JPKCom FA inline SVG shortcode",
@@ -10,7 +10,7 @@
   "Network": "true",
   "Testedupto": "7.0",
   "Forexample": "",
-  "Stabletag": "2.0.12",
+  "Stabletag": "2.0.13",
   "RequiresPHP": "8.3",
   "License": "GPL-2.0-or-later",
   "LicenseURI": "https://www.gnu.org/licenses/gpl-2.0.html",

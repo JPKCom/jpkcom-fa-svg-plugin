@@ -3,7 +3,7 @@
 **Plugin Name:** JPKCom FA inline SVG shortcode  
 **Plugin URI:** https://github.com/JPKCom/jpkcom-fa-svg-plugin  
 **Description:** A plugin for loading inline SVGs from Font Awesome (Pro) v5.15.4 using a shortcode  
-**Version:** 2.0.12  
+**Version:** 2.0.13  
 **Author:** Jean Pierre Kolb <jpk@jpkc.com>  
 **Author URI:** https://www.jpkc.com/  
 **Contributors:** JPKCom  
@@ -12,7 +12,7 @@
 **Tested up to:** 7.0  
 **Requires PHP:** 8.3  
 **Network:** true  
-**Stable tag:** 2.0.12  
+**Stable tag:** 2.0.13  
 **License:** GPL-2.0-or-later  
 **License URI:** https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,9 @@ echo do_shortcode( '[jsvg type="fas" name="snowboarding" class="fa-4x fa-rotate-
 
 
 ## Changelog
+
+### 2.0.13
+* Added: plugin banners (`assets/banner-1544x500.avif`, `assets/banner-772x250.avif`) — a plain `#3c4955` surface with no lettering. The update manifest already advertised these two URLs, but nothing was published under them, so the plugin card in wp-admin had a broken banner
 
 ### 2.0.12
 * CI: the release step no longer copies the staging directory into itself, so the ZIP has no empty `jpkcom-fa-svg-plugin/jpkcom-fa-svg-plugin/` folder
