@@ -3,16 +3,16 @@
 Plugin Name: JPKCom FA inline SVG shortcode
 Plugin URI: https://github.com/JPKCom/jpkcom-fa-svg-plugin
 Description: A plugin for loading inline SVGs from Font Awesome (Pro) v5.15.4 using a shortcode.
-Version: 2.0.13
+Version: 2.0.14
 Author: Jean Pierre Kolb <jpk@jpkc.com>
 Author URI: https://www.jpkc.com/
 Contributors: JPKCom
 Tags: FontAwesome, SVG, Inline, Shortcode, Gutenberg
 Requires at least: 6.9
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 8.3
 Network: true
-Stable tag: 2.0.13
+Stable tag: 2.0.14
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 */
@@ -30,7 +30,7 @@ if ( ! defined( constant_name: 'WPINC' ) ) {
  * @since 2.0.9
  */
 if ( ! defined( 'JPKCOM_FASVG_VERSION' ) ) {
-    define( 'JPKCOM_FASVG_VERSION', '2.0.13' );
+    define( 'JPKCOM_FASVG_VERSION', '2.0.14' );
 }
 
 
@@ -77,6 +77,34 @@ define( constant_name: 'JPKCOM_FASVG_PLUGIN_URL', value: plugin_dir_url( __FILE_
 } )();
 
 /**
+ * Register the Font Awesome inline-SVG stylesheet.
+ *
+ * Registration is idempotent: the block editor collects the canvas assets in a
+ * separate `WP_Styles` instance (see `_wp_get_iframed_editor_assets()`), so this
+ * runs more than once per request. Without the guard the inline rule would be
+ * appended to the handle twice.
+ *
+ * @since 2.0.14
+ *
+ * @return void
+ */
+if ( ! function_exists( function: 'jpkcom_fasvg_register_style' ) ) {
+
+    function jpkcom_fasvg_register_style(): void {
+
+        if ( wp_style_is( 'jpkcom-fasvg-style', 'registered' ) ) {
+            return;
+        }
+
+        wp_register_style( 'jpkcom-fasvg-style', JPKCOM_FASVG_URL . 'css/svg-with-js.min.css', array(), '5.15.4', 'all' );
+        wp_add_inline_style( 'jpkcom-fasvg-style', '.svg-inline--fa{color:inherit;fill:currentColor;}' );
+
+    }
+
+}
+
+
+/**
  * Enqueue the Font Awesome inline-SVG stylesheet on the front end.
  *
  * @since 1.0.0
@@ -87,9 +115,8 @@ if ( ! function_exists( function: 'jpkcom_fasvg_enqueue_files' ) ) {
 
     function jpkcom_fasvg_enqueue_files(): void {
 
-        wp_enqueue_style( 'jpkcom-fasvg-style', JPKCOM_FASVG_URL . 'css/svg-with-js.min.css', array(), '5.15.4', 'all' );
-        $jpkcom_fa_inline_css = '.svg-inline--fa{color:inherit;fill:currentColor;}';
-        wp_add_inline_style( 'jpkcom-fasvg-style', $jpkcom_fa_inline_css );
+        jpkcom_fasvg_register_style();
+        wp_enqueue_style( 'jpkcom-fasvg-style' );
 
 	}
 
@@ -101,6 +128,24 @@ add_action( 'wp_enqueue_scripts', 'jpkcom_fasvg_enqueue_files' );
 /**
  * Enqueue the Font Awesome inline-SVG stylesheet in the block editor.
  *
+ * Hooked to `enqueue_block_assets`, not `enqueue_block_editor_assets`. From
+ * WordPress 7.1 the post editor always renders its canvas in an iframe, and
+ * `enqueue_block_editor_assets` only reaches the surrounding admin document —
+ * the icons inside the canvas would lose the Font Awesome sizing rules
+ * (`height: 1em`, `display: inline-block`, `overflow: visible`) and render at
+ * their intrinsic SVG size.
+ *
+ * `enqueue_block_assets` fires in both places: `_wp_get_iframed_editor_assets()`
+ * runs it to build the canvas assets, and `wp_common_block_scripts_and_styles()`
+ * runs it on `admin_enqueue_scripts` for the admin document, which keeps the
+ * behaviour of the non-iframed editor (WordPress <= 7.0) unchanged.
+ *
+ * The hook also fires on the front end, where `wp_enqueue_scripts` above already
+ * handles the stylesheet — hence the `is_admin()` guard. Enqueuing it here as
+ * well would be harmless (same handle), but the front end must not depend on
+ * this path: optimisation plugins routinely unhook
+ * `wp_common_block_scripts_and_styles` to strip the core block library.
+ *
  * @since 1.0.0
  *
  * @return void
@@ -109,15 +154,18 @@ if ( ! function_exists( function: 'jpkcom_fasvg_enqueue_gutenberg_files' ) ) {
 
     function jpkcom_fasvg_enqueue_gutenberg_files(): void {
 
-        wp_enqueue_style( 'jpkcom-fasvg-gutenberg-style', JPKCOM_FASVG_URL . 'css/svg-with-js.min.css', array(), '5.15.4', 'all' );
-        $jpkcom_fa_inline_css = '.svg-inline--fa{color:inherit;fill:currentColor;}';
-        wp_add_inline_style( 'jpkcom-fasvg-gutenberg-style', $jpkcom_fa_inline_css );
+        if ( ! is_admin() ) {
+            return;
+        }
+
+        jpkcom_fasvg_register_style();
+        wp_enqueue_style( 'jpkcom-fasvg-style' );
 
     }
 
 }
 
-add_action( 'enqueue_block_editor_assets', 'jpkcom_fasvg_enqueue_gutenberg_files' );
+add_action( 'enqueue_block_assets', 'jpkcom_fasvg_enqueue_gutenberg_files' );
 
 
 /**

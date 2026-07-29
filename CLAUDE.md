@@ -27,10 +27,37 @@ Main file (jpkcom-fa-svg-plugin.php)
 ├── JPKCOM_FASVG_VERSION constant
 ├── init @ priority 5: boot JPKComGitPluginUpdater
 ├── Path/URL constants (IIFE, single wp_upload_dir() call — no globals)
+├── jpkcom_fasvg_register_style()          → idempotent, one handle for both contexts
 ├── jpkcom_fasvg_enqueue_files()           → wp_enqueue_scripts
-├── jpkcom_fasvg_enqueue_gutenberg_files() → enqueue_block_editor_assets
+├── jpkcom_fasvg_enqueue_gutenberg_files() → enqueue_block_assets (is_admin guard)
 ├── jpkcom_fasvg_navigation_fa()           → wp_nav_menu_objects
 └── jsvg_code()                            → add_shortcode( 'jsvg' )
+```
+
+---
+
+## Editor-Assets: `enqueue_block_assets`, nicht `enqueue_block_editor_assets`
+
+Ab WordPress 7.1 rendert der Post-Editor seinen Canvas **immer** im iframe, unabhängig von Theme und `apiVersion`. `enqueue_block_editor_assets` lädt ausschließlich ins umgebende Admin-Dokument und erreicht den Canvas dann nicht mehr. Genau daran hing dieses Plugin bis 2.0.13.
+
+Der Ersatz ist `enqueue_block_assets`. Der Hook feuert an drei Stellen, und alle drei sind hier gewollt bzw. bewusst abgefangen:
+
+| Feuerstelle | Kontext | Verhalten hier |
+|---|---|---|
+| `_wp_get_iframed_editor_assets()` (`wp-includes/block-editor.php`) | baut `$settings['__unstableResolvedAssets']`, das der iframe in seinen `<head>` injiziert | **der eigentliche Fix** — CSS landet im Canvas |
+| `wp_common_block_scripts_and_styles()` via `admin_enqueue_scripts` | Admin-Dokument auf Block-Editor-Screens | erhält das bisherige Verhalten für den nicht-iframed Editor (WP ≤ 7.0) |
+| `wp_common_block_scripts_and_styles()` via `wp_enqueue_scripts` | Frontend | per `is_admin()`-Guard übersprungen |
+
+**Warum das Frontend nicht über diesen Hook läuft.** `enqueue_block_assets` feuert im Frontend nur, solange `wp_common_block_scripts_and_styles` an `wp_enqueue_scripts` hängt. Performance-Plugins hängen genau diese Funktion aus, um `wp-block-library` loszuwerden — im Testsystem ist `speed-booster-pack` aktiv. Das Frontend behält deshalb seine eigene `wp_enqueue_scripts`-Registrierung.
+
+**Warum `jpkcom_fasvg_register_style()` idempotent sein muss.** `_wp_get_iframed_editor_assets()` tauscht `$wp_styles` gegen eine frische `WP_Styles`-Instanz aus, bevor es den Hook feuert. Der Callback läuft also mehrfach pro Request. Ohne die `wp_style_is( …, 'registered' )`-Prüfung würde `wp_add_inline_style()` die `.svg-inline--fa`-Regel mehrfach an den Handle hängen.
+
+**Nachweis (empirisch, DDEV `posts`, WP 7.0.2, voller Plugin-Stack):** im echten `post-new.php`-Request enthält `__unstableResolvedAssets.styles` mit 2.0.13 **kein** `jpkcom-fasvg` und mit 2.0.14 den `<link>` plus die Inline-Regel genau einmal; das Admin-Dokument hat sie in beiden Ständen. Nachstellen lässt sich das ohne Browser:
+
+```bash
+ddev wp eval 'define("WP_ADMIN", true);
+$a = _wp_get_iframed_editor_assets();
+echo str_contains( $a["styles"], "jpkcom_fasvg" ) ? "im Canvas\n" : "FEHLT im Canvas\n";'
 ```
 
 ---
