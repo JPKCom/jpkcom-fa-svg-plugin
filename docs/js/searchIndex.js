@@ -86,6 +86,11 @@ Search.appendIndex(
             "summary": "",
             "url": "namespaces/default.html#constant_JPKCOM_FASVG_PLUGIN_URL"
         },                {
+            "fqsen": "\\jpkcom_fasvg_register_style\u0028\u0029",
+            "name": "jpkcom_fasvg_register_style",
+            "summary": "",
+            "url": "namespaces/default.html#function_jpkcom_fasvg_register_style"
+        },                {
             "fqsen": "\\jpkcom_fasvg_enqueue_files\u0028\u0029",
             "name": "jpkcom_fasvg_enqueue_files",
             "summary": "",

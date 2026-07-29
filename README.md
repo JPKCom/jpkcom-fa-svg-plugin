@@ -3,16 +3,16 @@
 **Plugin Name:** JPKCom FA inline SVG shortcode  
 **Plugin URI:** https://github.com/JPKCom/jpkcom-fa-svg-plugin  
 **Description:** A plugin for loading inline SVGs from Font Awesome (Pro) v5.15.4 using a shortcode  
-**Version:** 2.0.13  
+**Version:** 2.0.14  
 **Author:** Jean Pierre Kolb <jpk@jpkc.com>  
 **Author URI:** https://www.jpkc.com/  
 **Contributors:** JPKCom  
 **Tags:** FontAwesome, SVG, Inline, Shortcode, Gutenberg  
 **Requires at least:** 6.9  
-**Tested up to:** 7.0  
+**Tested up to:** 7.1  
 **Requires PHP:** 8.3  
 **Network:** true  
-**Stable tag:** 2.0.13  
+**Stable tag:** 2.0.14  
 **License:** GPL-2.0-or-later  
 **License URI:** https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,14 @@ echo do_shortcode( '[jsvg type="fas" name="snowboarding" class="fa-4x fa-rotate-
 
 
 ## Changelog
+
+### 2.0.14
+* Changed: `Tested up to` raised to WordPress 7.1
+* Changed: the bundled updater's runtime floor now matches the plugin's own minimum. It bailed out below WordPress 6.8 while the plugin header has required 6.9 for several releases, so the check could never fire on a supported installation
+* Fixed: the Font Awesome stylesheet now reaches the block editor **canvas**. It was hooked to `enqueue_block_editor_assets`, which only loads into the surrounding admin document. From WordPress 7.1 the post editor always renders its canvas in an iframe, so inline SVGs shown in a block preview would have lost the Font Awesome sizing rules (`height: 1em`, `display: inline-block`, `overflow: visible`) and rendered at their intrinsic size. The hook is now `enqueue_block_assets`, which WordPress runs both when it assembles the iframe assets and on block editor admin screens — the non-iframed editor of WordPress 7.0 and earlier behaves exactly as before
+* Changed: one shared style handle `jpkcom-fasvg-style` for front end and editor; the separate editor handle `jpkcom-fasvg-gutenberg-style` is gone. Registration is idempotent, so the inline `.svg-inline--fa` rule is emitted once per document
+* The front end is untouched: it keeps its own `wp_enqueue_scripts` registration and deliberately does not rely on `enqueue_block_assets`, which optimisation plugins unhook to strip the core block library
+* CI: the release manifest's fallback values for `requires` and `tested` now say 6.9 and 7.1. They only apply when the README metadata cannot be read, but a stale fallback would have published a minimum the plugin no longer supports
 
 ### 2.0.13
 * Added: plugin banners (`assets/banner-1544x500.avif`, `assets/banner-772x250.avif`) — a plain `#3c4955` surface with no lettering. The update manifest already advertised these two URLs, but nothing was published under them, so the plugin card in wp-admin had a broken banner
