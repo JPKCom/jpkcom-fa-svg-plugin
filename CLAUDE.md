@@ -26,13 +26,17 @@ Main file (jpkcom-fa-svg-plugin.php)
 ├── Plugin header (Network: true)
 ├── JPKCOM_FASVG_VERSION constant
 ├── init @ priority 5: boot JPKComGitPluginUpdater
-├── Path/URL constants (IIFE, single wp_upload_dir() call — no globals)
+├── jpkcom_fasvg_path() / jpkcom_fasvg_url()  → resolved per call, switch_to_blog-safe
+├── Path/URL constants (guarded, derived from those helpers)
 ├── jpkcom_fasvg_register_style()          → idempotent, one handle for both contexts
 ├── jpkcom_fasvg_enqueue_files()           → wp_enqueue_scripts
 ├── jpkcom_fasvg_enqueue_gutenberg_files() → enqueue_block_assets (is_admin guard)
 ├── jpkcom_fasvg_navigation_fa()           → wp_nav_menu_objects
-└── jsvg_code()                            → add_shortcode( 'jsvg' )
+├── jpkcom_fasvg_shortcode()               → add_shortcode( 'jsvg' )
+└── jsvg_code()                            → deprecated shim, calls the above
 ```
+
+Every function is `jpkcom_fasvg_`-prefixed and wrapped in `function_exists()`. Until 2.0.16 the shortcode callback was the exception — a global, unguarded `jsvg_code()`, a name generic enough that a theme declaring it would have caused a fatal redeclare on load. It survives as a deprecated shim for anything calling it directly.
 
 ---
 
@@ -69,8 +73,16 @@ echo str_contains( $a["styles"], "jpkcom_fasvg" ) ? "in canvas\n" : "MISSING fro
 | `JPKCOM_FASVG_VERSION` | matches the header `Version:` | Plugin version (kept in sync with header/README/phpdoc.xml) |
 | `JPKCOM_FASVG_PLUGIN_PATH` | `plugin_dir_path(__FILE__)` | Absolute plugin path |
 | `JPKCOM_FASVG_PLUGIN_URL` | `plugin_dir_url(__FILE__)` | Plugin URL |
-| `JPKCOM_FASVG_PATH` | `<uploads>/jpkcom_fasvg/` | Filesystem base for CSS + SVGs |
-| `JPKCOM_FASVG_URL` | `<uploads-url>/jpkcom_fasvg/` | URL base for CSS + SVGs |
+| `JPKCOM_FASVG_PATH` | `<uploads>/jpkcom_fasvg/` | Filesystem base for CSS + SVGs — **prefer `jpkcom_fasvg_path()`** |
+| `JPKCOM_FASVG_URL` | `<uploads-url>/jpkcom_fasvg/` | URL base for CSS + SVGs — **prefer `jpkcom_fasvg_url()`** |
+
+All five are `defined()`-guarded, so a stray second copy of the file cannot raise "constant already defined".
+
+### Why the two path helpers exist
+
+The plugin is `Network: true`, and on multisite every site has its own upload directory. A value captured while the file was being included keeps pointing at whichever site was active then, which is wrong for anything rendered after `switch_to_blog()`. `jpkcom_fasvg_path()` and `jpkcom_fasvg_url()` resolve on every call and are what the shortcode and the stylesheet registration use; the two constants remain only for backwards compatibility, since they are part of the documented surface.
+
+They call `wp_get_upload_dir()` — that is `wp_upload_dir( null, false )`, the variant that does **not** attempt to create the directory. Reading icons never needs that side effect, and the previous load-time `wp_upload_dir()` took the creating path on every request. Both are statically cached in core; measured 0.38 µs per call, so resolving per call costs nothing worth optimising.
 
 ---
 
@@ -88,7 +100,20 @@ echo str_contains( $a["styles"], "jpkcom_fasvg" ) ? "in canvas\n" : "MISSING fro
 | `style` | – | Inline CSS on the `<svg>` (escaped) |
 | `title` | – | Adds a `<title>` element and `aria-labelledby`; otherwise `aria-hidden="true"` |
 
-The raw SVG file contents are returned inline. The trust boundary is the local `uploads/jpkcom_fasvg/svgs/` directory — only place vetted Font Awesome SVGs there.
+The raw SVG file contents are returned inline. The trust boundary is the local `uploads/jpkcom_fasvg/svgs/` directory — only place vetted Font Awesome SVGs there. Anyone able to write into it gets stored XSS on every page using the shortcode.
+
+**Path traversal is closed, and tested.** `basename()` plus `sanitize_file_name()` reduce `name` to a flat string, `.svg` is always appended, and `type` is whitelisted against five folders with a fallback to `solid/`. Measured:
+
+| `name=` | resolved file |
+|---|---|
+| `../../../../etc/passwd` | `passwd.svg` |
+| `solid/../../wp-config` | `wp-config.svg` |
+| `..` | `.svg` |
+| `a\0b` (null byte) | `ab.svg` |
+
+`sanitize_file_name()` trims `.-_` from both ends, which is what turns `..` into an empty string. `tests/test-hooks.php` asserts five such inputs return the built-in fallback square and never read a file placed outside the icon folder.
+
+The `<title>` id comes from `wp_unique_id()`. Until 2.0.16 it was `wp_rand( 10, 500000 )` — with a few dozen titled icons on one page the collision chance was small but real, and a duplicate id silently breaks `aria-labelledby` and is invalid HTML.
 
 ---
 
@@ -133,15 +158,39 @@ Triggered by **pushing a `v*` tag** (`.github/workflows/release.yml`). The workf
 ## Security Checklist
 
 - `declare(strict_types=1)` in every PHP file
-- `[jsvg] name` sanitized via `sanitize_file_name( basename() )` (path-traversal safe)
+- `[jsvg] name` sanitized via `sanitize_file_name( basename() )`, `type` whitelisted — path traversal closed and covered by tests
 - `file_get_contents()` guarded against a `false` return
-- Shortcode attributes escaped with `esc_attr()` in HTML-attribute context
+- Shortcode attributes escaped with `esc_attr()` in attribute context, `esc_html()` for the `<title>` element text
+- Every function prefixed and `function_exists()`-guarded; no unprefixed global names
 - Updater: SHA256 verification + URL validation (audited separately)
+
+**Known and accepted:** `jpkcom_fasvg_navigation_fa()` expands *every* shortcode in a menu title that contains `[jsvg`, not only that one, because it hands the whole title to `do_shortcode()`. Editing menus requires `edit_theme_options`, so this is admin-only — but the scope is wider than the function name suggests.
+
+---
+
+## Tests
+
+`tests/test-hooks.php` runs standalone — no WordPress. It stubs the functions the main file touches, creates a throwaway icon directory under the system temp dir (including a file *outside* the icon folder that must stay unreachable), requires the plugin and renders the shortcode directly. 26 cases covering the prefixed callback and the deprecated shim, the switch-safe path helpers, the rendered markup, title escaping, unique ids, the style whitelist, five path-traversal attempts, and the hook registrations. 5 of them fail against 2.0.15.
+
+```bash
+php tests/test-hooks.php   # exit 0 = green
+```
+
+Two notes on the suite itself, so it is not misread:
+
+- The `wp_rand()` stub returns a **constant** on purpose. Against 2.0.15 that makes the "distinct ids" case fail deterministically instead of depending on a collision happening to occur — with 200 random draws from 500 000 the collision chance is only about 4 %, which would have made the test flaky.
+- The title-escaping case does **not** discriminate between 2.0.15 and 2.0.16: in WordPress `esc_attr()` and `esc_html()` produce identical output. The change to `esc_html()` is a correctness-of-intent fix, and the assertion guards the escaping itself, not the switch.
 
 ---
 
 ## Release Checklist
 
-1. Bump version in: header `Version:` + `Stable tag:`, `JPKCOM_FASVG_VERSION`, `README.md` (`**Version:**`, `**Stable tag:**`), `phpdoc.xml` `<version>`
+1. Bump the version in five places:
+   - Plugin header `Version:`
+   - Plugin header `Stable tag:`
+   - Constant `JPKCOM_FASVG_VERSION`
+   - `phpdoc.xml` `<version number="…">`
+   - `README.md` — `**Version:**` and `**Stable tag:**`
 2. Add a `### x.y.z` block to `## Changelog` in `README.md`
-3. Commit, tag `vx.y.z`, push the tag → the workflow builds and publishes everything
+3. Run `php tests/test-hooks.php`
+4. Commit, then push the tag `vx.y.z` → the workflow builds and publishes everything

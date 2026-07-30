@@ -3,7 +3,7 @@
 Plugin Name: JPKCom FA inline SVG shortcode
 Plugin URI: https://github.com/JPKCom/jpkcom-fa-svg-plugin
 Description: A plugin for loading inline SVGs from Font Awesome (Pro) v5.15.4 using a shortcode.
-Version: 2.0.15
+Version: 2.0.16
 Author: Jean Pierre Kolb <jpk@jpkc.com>
 Author URI: https://www.jpkc.com/
 Contributors: JPKCom
@@ -12,7 +12,7 @@ Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 8.3
 Network: true
-Stable tag: 2.0.15
+Stable tag: 2.0.16
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 */
@@ -30,7 +30,7 @@ if ( ! defined( constant_name: 'WPINC' ) ) {
  * @since 2.0.9
  */
 if ( ! defined( 'JPKCOM_FASVG_VERSION' ) ) {
-    define( 'JPKCOM_FASVG_VERSION', '2.0.15' );
+    define( 'JPKCOM_FASVG_VERSION', '2.0.16' );
 }
 
 
@@ -60,21 +60,81 @@ add_action( 'init', static function (): void {
 }, 5 );
 
 /**
- * Plugin path, URL and Font Awesome upload directory constants.
+ * Plugin path and URL constants.
  *
  * @since 1.0.0
+ * @since 2.0.16 Guarded with defined() so a second copy of the file cannot
+ *               raise "constant already defined" warnings.
  */
-define( constant_name: 'JPKCOM_FASVG_PLUGIN_PATH', value: plugin_dir_path( __FILE__ ) );
-define( constant_name: 'JPKCOM_FASVG_PLUGIN_URL', value: plugin_dir_url( __FILE__ ) );
+if ( ! defined( 'JPKCOM_FASVG_PLUGIN_PATH' ) ) {
+    define( constant_name: 'JPKCOM_FASVG_PLUGIN_PATH', value: plugin_dir_path( __FILE__ ) );
+}
 
-( static function (): void {
+if ( ! defined( 'JPKCOM_FASVG_PLUGIN_URL' ) ) {
+    define( constant_name: 'JPKCOM_FASVG_PLUGIN_URL', value: plugin_dir_url( __FILE__ ) );
+}
 
-    $jpkcom_fasvg_upload = wp_upload_dir();
+if ( ! function_exists( function: 'jpkcom_fasvg_path' ) ) {
 
-    define( constant_name: 'JPKCOM_FASVG_PATH', value: $jpkcom_fasvg_upload['basedir'] . '/jpkcom_fasvg/' );
-    define( constant_name: 'JPKCOM_FASVG_URL', value: $jpkcom_fasvg_upload['baseurl'] . '/jpkcom_fasvg/' );
+    /**
+     * Filesystem base for the Font Awesome CSS and SVGs.
+     *
+     * Resolved on every call rather than once at load time. The plugin can be
+     * network-activated, and on multisite each site has its own upload
+     * directory: a value captured while the file was included would keep
+     * pointing at the site that happened to be active then, which is wrong for
+     * anything rendered after `switch_to_blog()`.
+     *
+     * Uses `wp_get_upload_dir()`, i.e. `wp_upload_dir( null, false )` — the
+     * variant that does not try to create the directory. Reading icons never
+     * needs that side effect. Both are statically cached, so the per-call cost
+     * is a fraction of a microsecond.
+     *
+     * @since 2.0.16
+     *
+     * @return string Absolute path with a trailing slash.
+     */
+    function jpkcom_fasvg_path(): string {
+        return wp_get_upload_dir()['basedir'] . '/jpkcom_fasvg/';
+    }
 
-} )();
+}
+
+if ( ! function_exists( function: 'jpkcom_fasvg_url' ) ) {
+
+    /**
+     * URL base for the Font Awesome CSS and SVGs.
+     *
+     * Same reasoning as {@see jpkcom_fasvg_path()}.
+     *
+     * @since 2.0.16
+     *
+     * @return string URL with a trailing slash.
+     */
+    function jpkcom_fasvg_url(): string {
+        return wp_get_upload_dir()['baseurl'] . '/jpkcom_fasvg/';
+    }
+
+}
+
+/**
+ * Font Awesome upload directory constants.
+ *
+ * Kept for backwards compatibility: they are part of the documented surface and
+ * may be referenced from themes or snippets. They hold the values of whichever
+ * site was active when this file was included — use `jpkcom_fasvg_path()` and
+ * `jpkcom_fasvg_url()` instead, which stay correct across `switch_to_blog()`.
+ *
+ * @since 1.0.0
+ * @since 2.0.16 Guarded, and derived from the switch-safe helpers.
+ */
+if ( ! defined( 'JPKCOM_FASVG_PATH' ) ) {
+    define( constant_name: 'JPKCOM_FASVG_PATH', value: jpkcom_fasvg_path() );
+}
+
+if ( ! defined( 'JPKCOM_FASVG_URL' ) ) {
+    define( constant_name: 'JPKCOM_FASVG_URL', value: jpkcom_fasvg_url() );
+}
 
 /**
  * Register the Font Awesome inline-SVG stylesheet.
@@ -96,7 +156,7 @@ if ( ! function_exists( function: 'jpkcom_fasvg_register_style' ) ) {
             return;
         }
 
-        wp_register_style( 'jpkcom-fasvg-style', JPKCOM_FASVG_URL . 'css/svg-with-js.min.css', array(), '5.15.4', 'all' );
+        wp_register_style( 'jpkcom-fasvg-style', jpkcom_fasvg_url() . 'css/svg-with-js.min.css', array(), '5.15.4', 'all' );
         wp_add_inline_style( 'jpkcom-fasvg-style', '.svg-inline--fa{color:inherit;fill:currentColor;}' );
 
     }
@@ -171,6 +231,10 @@ add_action( 'enqueue_block_assets', 'jpkcom_fasvg_enqueue_gutenberg_files' );
 /**
  * Run shortcodes contained in navigation menu item titles.
  *
+ * Note that `do_shortcode()` expands *every* shortcode in a title that contains
+ * `[jsvg`, not only that one. Editing menus requires `edit_theme_options`, so
+ * this is admin-only, but the scope is wider than the function name suggests.
+ *
  * @since 1.0.0
  *
  * @param array $menu_items The navigation menu item objects.
@@ -200,154 +264,192 @@ if ( ! function_exists( function: 'jpkcom_fasvg_navigation_fa' ) ) {
 add_filter( 'wp_nav_menu_objects', 'jpkcom_fasvg_navigation_fa' );
 
 
-/**
- * Render the [jsvg] shortcode as an inline Font Awesome SVG.
- *
- * Supported attributes:
- * - type:  Font Awesome style folder (fas, fal, far, fad, fab). Default 'fas'.
- * - name:  Icon file name without extension. Default 'square-full'.
- * - class: Additional CSS classes for the <svg> element.
- * - style: Inline CSS for the <svg> element.
- * - title: Accessible title; sets aria-labelledby and a <title> element.
- *
- * @since 1.0.0
- *
- * @param array<string, string>|string $atts Shortcode attributes ( empty string when none are supplied ).
- * @return string The inline SVG markup.
- */
-function jsvg_code( $atts ): string {
+if ( ! function_exists( function: 'jpkcom_fasvg_shortcode' ) ) {
 
-    $fa_svg_path = JPKCOM_FASVG_PATH . 'svgs/';
-    $fa_svg_folder = 'solid/';
-    $fa_svg_icon_name = 'square-full.svg';
-    $fa_svg_title_id = 'svg-title-' . wp_rand( min: 10, max: 500000 );
-    $fa_svg_title_aria = ' aria-hidden="true"';
-    $fa_svg_attributes = ' role="img"';
-    $fa_svg_source = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M512 512H0V0h512v512z"/></svg>';
-    $classHTML = '';
-    $styleHTML = '';
-    $titleHTML = '';
+    /**
+     * Render the [jsvg] shortcode as an inline Font Awesome SVG.
+     *
+     * Supported attributes:
+     * - type:  Font Awesome style folder (fas, fal, far, fad, fab). Default 'fas'.
+     * - name:  Icon file name without extension. Default 'square-full'.
+     * - class: Additional CSS classes for the <svg> element.
+     * - style: Inline CSS for the <svg> element.
+     * - title: Accessible title; sets aria-labelledby and a <title> element.
+     *
+     * The file name is reduced to a flat name with `basename()` and
+     * `sanitize_file_name()`, and `.svg` is always appended, so no path outside
+     * `<uploads>/jpkcom_fasvg/svgs/<style>/` can be reached. The style folder is
+     * whitelisted. The raw file contents are returned inline — the trust
+     * boundary is that directory, so only vetted Font Awesome SVGs belong there.
+     *
+     * @since 1.0.0
+     * @since 2.0.16 Renamed from the unprefixed `jsvg_code()` and wrapped in a
+     *               `function_exists()` guard, matching every other function in
+     *               this file. `jsvg_code()` remains as a deprecated shim.
+     *
+     * @param array<string, string>|string $atts Shortcode attributes ( empty string when none are supplied ).
+     * @return string The inline SVG markup.
+     */
+    function jpkcom_fasvg_shortcode( $atts ): string {
 
-    // Attributes
-    $atts = shortcode_atts(
-        array (
-            'type' => '',
-            'name' => '',
-            'class' => '',
-            'style' => '',
-            'title' => '',
-        ),
-        $atts,
-        'jsvg'
-    );
-
-    // Folder selection
-    if( $atts['type'] !== '' ) {
-
-        if( $atts['type'] === 'fas' ) {
-
-            $fa_svg_folder = 'solid/';
-
-        } elseif( $atts['type'] === 'fal' ) {
-
-            $fa_svg_folder = 'light/';
-
-        } elseif( $atts['type'] === 'far' ) {
-
-            $fa_svg_folder = 'regular/';
-
-        } elseif( $atts['type'] === 'fad' ) {
-
-            $fa_svg_folder = 'duotone/';
-
-        } elseif( $atts['type'] === 'fab' ) {
-
-            $fa_svg_folder = 'brands/';
-
-        } else {
-
-            $fa_svg_folder = 'solid/';
-
-        }
-
-    }
-
-    // File name selection
-    if( $atts['name'] !== '' ) {
-
-        $fa_svg_icon_name = sanitize_file_name( basename( $atts['name'] ) ) . '.svg';
-
-    } else {
-
+        $fa_svg_path = jpkcom_fasvg_path() . 'svgs/';
         $fa_svg_folder = 'solid/';
         $fa_svg_icon_name = 'square-full.svg';
+        $fa_svg_title_id = wp_unique_id( 'svg-title-' );
+        $fa_svg_title_aria = ' aria-hidden="true"';
+        $fa_svg_attributes = ' role="img"';
+        $fa_svg_source = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M512 512H0V0h512v512z"/></svg>';
+        $classHTML = '';
+        $styleHTML = '';
+        $titleHTML = '';
 
-    }
+        // Attributes
+        $atts = shortcode_atts(
+            array (
+                'type' => '',
+                'name' => '',
+                'class' => '',
+                'style' => '',
+                'title' => '',
+            ),
+            $atts,
+            'jsvg'
+        );
 
-    // Get file contents
-    $fa_svg_file = $fa_svg_path . $fa_svg_folder . $fa_svg_icon_name;
+        // Folder selection
+        if( $atts['type'] !== '' ) {
 
-    if ( file_exists( filename: $fa_svg_file ) ) {
+            if( $atts['type'] === 'fas' ) {
 
-        $fa_svg_contents = file_get_contents( filename: $fa_svg_file );
+                $fa_svg_folder = 'solid/';
 
-        if ( false !== $fa_svg_contents ) {
+            } elseif( $atts['type'] === 'fal' ) {
 
-            $fa_svg_source = $fa_svg_contents;
+                $fa_svg_folder = 'light/';
+
+            } elseif( $atts['type'] === 'far' ) {
+
+                $fa_svg_folder = 'regular/';
+
+            } elseif( $atts['type'] === 'fad' ) {
+
+                $fa_svg_folder = 'duotone/';
+
+            } elseif( $atts['type'] === 'fab' ) {
+
+                $fa_svg_folder = 'brands/';
+
+            } else {
+
+                $fa_svg_folder = 'solid/';
+
+            }
 
         }
 
-    }
+        // File name selection
+        if( $atts['name'] !== '' ) {
 
-    // Set class attribute
-    if( $atts['class'] !== '' ) {
-
-        $classHTML = ' class="svg-inline--fa fa-' . esc_attr( $atts['name'] ) . ' ' . esc_attr( $atts['class'] ) . '"';
-
-    } else {
-
-        $classHTML = ' class="svg-inline--fa fa-' . esc_attr( $atts['name'] ) . '"';
-    }
-
-    // Set style attribute
-    if( $atts['style'] !== '' ) {
-
-        $styleHTML = ' style="' . esc_attr( $atts['style'] ) . '"';
-
-    }
-
-    // Set SVG title and ARIA label attribute
-    if( $atts['title'] !== '' ) {
-
-        $titleHTML = '<title id="' . $fa_svg_title_id . '">' . esc_attr( $atts['title'] ) . '</title>';
-        $fa_svg_title_aria = ' aria-labelledby="' .  $fa_svg_title_id . '"';
-
-    }
-
-    // Add attributes to SVG
-    $fa_svg_source = str_replace(search: '<svg', replace: '<svg' . $classHTML . $fa_svg_attributes . $fa_svg_title_aria . $styleHTML, subject: $fa_svg_source);
-
-    // Add SVG title tag
-    if( $atts['title'] !== '' ) {
-
-        $fa_svg_close_position = strpos( haystack: $fa_svg_source, needle: '>' );
-
-        if ( $fa_svg_close_position === false ) {
-
-            $titleHTML = '';
+            $fa_svg_icon_name = sanitize_file_name( basename( $atts['name'] ) ) . '.svg';
 
         } else {
 
-            $fa_svg_close_position = $fa_svg_close_position + 1;
-            $fa_svg_source = substr_replace( string: $fa_svg_source, replace: $titleHTML, offset: $fa_svg_close_position, length: 0 );
+            $fa_svg_folder = 'solid/';
+            $fa_svg_icon_name = 'square-full.svg';
 
         }
 
-    }
+        // Get file contents
+        $fa_svg_file = $fa_svg_path . $fa_svg_folder . $fa_svg_icon_name;
 
-    // Return SVG
-    return $fa_svg_source;
+        if ( file_exists( filename: $fa_svg_file ) ) {
+
+            $fa_svg_contents = file_get_contents( filename: $fa_svg_file );
+
+            if ( false !== $fa_svg_contents ) {
+
+                $fa_svg_source = $fa_svg_contents;
+
+            }
+
+        }
+
+        // Set class attribute
+        if( $atts['class'] !== '' ) {
+
+            $classHTML = ' class="svg-inline--fa fa-' . esc_attr( $atts['name'] ) . ' ' . esc_attr( $atts['class'] ) . '"';
+
+        } else {
+
+            $classHTML = ' class="svg-inline--fa fa-' . esc_attr( $atts['name'] ) . '"';
+        }
+
+        // Set style attribute
+        if( $atts['style'] !== '' ) {
+
+            $styleHTML = ' style="' . esc_attr( $atts['style'] ) . '"';
+
+        }
+
+        // Set SVG title and ARIA label attribute
+        if( $atts['title'] !== '' ) {
+
+            // esc_html(), not esc_attr(): this is element text, not an attribute value.
+            $titleHTML = '<title id="' . esc_attr( $fa_svg_title_id ) . '">' . esc_html( $atts['title'] ) . '</title>';
+            $fa_svg_title_aria = ' aria-labelledby="' . esc_attr( $fa_svg_title_id ) . '"';
+
+        }
+
+        // Add attributes to SVG
+        $fa_svg_source = str_replace(search: '<svg', replace: '<svg' . $classHTML . $fa_svg_attributes . $fa_svg_title_aria . $styleHTML, subject: $fa_svg_source);
+
+        // Add SVG title tag
+        if( $atts['title'] !== '' ) {
+
+            $fa_svg_close_position = strpos( haystack: $fa_svg_source, needle: '>' );
+
+            if ( $fa_svg_close_position === false ) {
+
+                $titleHTML = '';
+
+            } else {
+
+                $fa_svg_close_position = $fa_svg_close_position + 1;
+                $fa_svg_source = substr_replace( string: $fa_svg_source, replace: $titleHTML, offset: $fa_svg_close_position, length: 0 );
+
+            }
+
+        }
+
+        // Return SVG
+        return $fa_svg_source;
+
+    }
 
 }
 
-add_shortcode( 'jsvg', 'jsvg_code' );
+add_shortcode( 'jsvg', 'jpkcom_fasvg_shortcode' );
+
+
+if ( ! function_exists( function: 'jsvg_code' ) ) {
+
+    /**
+     * Deprecated alias of {@see jpkcom_fasvg_shortcode()}.
+     *
+     * The original name carried no vendor prefix and no `function_exists()`
+     * guard, so any theme or plugin declaring `jsvg_code` produced a fatal
+     * redeclare error on load. Kept as a shim for code calling it directly.
+     *
+     * @since      1.0.0
+     * @deprecated 2.0.16 Use jpkcom_fasvg_shortcode() instead.
+     *
+     * @param array<string, string>|string $atts Shortcode attributes.
+     * @return string The inline SVG markup.
+     */
+    function jsvg_code( $atts ): string {
+        _deprecated_function( __FUNCTION__, '2.0.16', 'jpkcom_fasvg_shortcode()' );
+
+        return jpkcom_fasvg_shortcode( $atts );
+    }
+
+}
