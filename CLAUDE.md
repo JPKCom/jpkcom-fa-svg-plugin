@@ -36,28 +36,28 @@ Main file (jpkcom-fa-svg-plugin.php)
 
 ---
 
-## Editor-Assets: `enqueue_block_assets`, nicht `enqueue_block_editor_assets`
+## Editor assets: `enqueue_block_assets`, not `enqueue_block_editor_assets`
 
-Ab WordPress 7.1 rendert der Post-Editor seinen Canvas **immer** im iframe, unabhängig von Theme und `apiVersion`. `enqueue_block_editor_assets` lädt ausschließlich ins umgebende Admin-Dokument und erreicht den Canvas dann nicht mehr. Genau daran hing dieses Plugin bis 2.0.13.
+As of WordPress 7.1 the post editor always renders its canvas inside an iframe, regardless of theme and `apiVersion`. `enqueue_block_editor_assets` only loads into the surrounding admin document and no longer reaches the canvas. That is exactly what this plugin depended on up to 2.0.13.
 
-Der Ersatz ist `enqueue_block_assets`. Der Hook feuert an drei Stellen, und alle drei sind hier gewollt bzw. bewusst abgefangen:
+The replacement is `enqueue_block_assets`. The hook fires in three places, all of them either intended or deliberately skipped:
 
-| Feuerstelle | Kontext | Verhalten hier |
+| Fires from | Context | Behaviour here |
 |---|---|---|
-| `_wp_get_iframed_editor_assets()` (`wp-includes/block-editor.php`) | baut `$settings['__unstableResolvedAssets']`, das der iframe in seinen `<head>` injiziert | **der eigentliche Fix** — CSS landet im Canvas |
-| `wp_common_block_scripts_and_styles()` via `admin_enqueue_scripts` | Admin-Dokument auf Block-Editor-Screens | erhält das bisherige Verhalten für den nicht-iframed Editor (WP ≤ 7.0) |
-| `wp_common_block_scripts_and_styles()` via `wp_enqueue_scripts` | Frontend | per `is_admin()`-Guard übersprungen |
+| `_wp_get_iframed_editor_assets()` (`wp-includes/block-editor.php`) | builds `$settings['__unstableResolvedAssets']`, which the iframe injects into its `<head>` | **the actual fix** — CSS reaches the canvas |
+| `wp_common_block_scripts_and_styles()` via `admin_enqueue_scripts` | admin document on block editor screens | preserves the previous behaviour for the non-iframed editor (WP ≤ 7.0) |
+| `wp_common_block_scripts_and_styles()` via `wp_enqueue_scripts` | front end | skipped by the `is_admin()` guard |
 
-**Warum das Frontend nicht über diesen Hook läuft.** `enqueue_block_assets` feuert im Frontend nur, solange `wp_common_block_scripts_and_styles` an `wp_enqueue_scripts` hängt. Performance-Plugins hängen genau diese Funktion aus, um `wp-block-library` loszuwerden — im Testsystem ist `speed-booster-pack` aktiv. Das Frontend behält deshalb seine eigene `wp_enqueue_scripts`-Registrierung.
+**Why the front end does not go through this hook.** On the front end `enqueue_block_assets` only fires while `wp_common_block_scripts_and_styles` is attached to `wp_enqueue_scripts`. Performance plugins unhook precisely that function to get rid of `wp-block-library` — `speed-booster-pack` is active on the test system. The front end therefore keeps its own `wp_enqueue_scripts` registration.
 
-**Warum `jpkcom_fasvg_register_style()` idempotent sein muss.** `_wp_get_iframed_editor_assets()` tauscht `$wp_styles` gegen eine frische `WP_Styles`-Instanz aus, bevor es den Hook feuert. Der Callback läuft also mehrfach pro Request. Ohne die `wp_style_is( …, 'registered' )`-Prüfung würde `wp_add_inline_style()` die `.svg-inline--fa`-Regel mehrfach an den Handle hängen.
+**Why `jpkcom_fasvg_register_style()` must be idempotent.** `_wp_get_iframed_editor_assets()` swaps `$wp_styles` for a fresh `WP_Styles` instance before firing the hook, so the callback runs several times per request. Without the `wp_style_is( …, 'registered' )` check, `wp_add_inline_style()` would attach the `.svg-inline--fa` rule to the handle repeatedly.
 
-**Nachweis (empirisch, DDEV `posts`, WP 7.0.2, voller Plugin-Stack):** im echten `post-new.php`-Request enthält `__unstableResolvedAssets.styles` mit 2.0.13 **kein** `jpkcom-fasvg` und mit 2.0.14 den `<link>` plus die Inline-Regel genau einmal; das Admin-Dokument hat sie in beiden Ständen. Nachstellen lässt sich das ohne Browser:
+**Evidence (empirical, DDEV `posts`, WP 7.0.2, full plugin stack):** in a real `post-new.php` request `__unstableResolvedAssets.styles` contains **no** `jpkcom-fasvg` on 2.0.13, and on 2.0.14 the `<link>` plus the inline rule exactly once; the admin document has them on both. Reproducible without a browser:
 
 ```bash
 ddev wp eval 'define("WP_ADMIN", true);
 $a = _wp_get_iframed_editor_assets();
-echo str_contains( $a["styles"], "jpkcom_fasvg" ) ? "im Canvas\n" : "FEHLT im Canvas\n";'
+echo str_contains( $a["styles"], "jpkcom_fasvg" ) ? "in canvas\n" : "MISSING from canvas\n";'
 ```
 
 ---
@@ -66,7 +66,7 @@ echo str_contains( $a["styles"], "jpkcom_fasvg" ) ? "im Canvas\n" : "FEHLT im Ca
 
 | Constant | Value | Purpose |
 |----------|-------|---------|
-| `JPKCOM_FASVG_VERSION` | `'2.0.12'` | Plugin version (kept in sync with header/README/phpdoc.xml) |
+| `JPKCOM_FASVG_VERSION` | matches the header `Version:` | Plugin version (kept in sync with header/README/phpdoc.xml) |
 | `JPKCOM_FASVG_PLUGIN_PATH` | `plugin_dir_path(__FILE__)` | Absolute plugin path |
 | `JPKCOM_FASVG_PLUGIN_URL` | `plugin_dir_url(__FILE__)` | Plugin URL |
 | `JPKCOM_FASVG_PATH` | `<uploads>/jpkcom_fasvg/` | Filesystem base for CSS + SVGs |
@@ -120,19 +120,11 @@ jpkcom-fa-svg-plugin/
 
 ## Release Workflow
 
-**Supply-chain: GitHub Actions sind auf Commit-SHAs gepinnt.** Alle `uses:`-Zeilen in `.github/workflows/` referenzieren einen 40-stelligen Commit-SHA statt eines Tags (`@v4`), mit der Version als Kommentar dahinter. Grund: ein Tag ist ein beweglicher Zeiger und lässt sich umhängen, ein SHA nicht. Da dieser Workflow die Plugin-ZIP **und** die SHA256-Summe erzeugt, der der Auto-Updater vertraut, würde eine kompromittierte Action ein manipuliertes ZIP samt passender Prüfsumme ausliefern — die Prüfsumme sichert den Transportweg, das Pinning den Build. `.github/dependabot.yml` hält die Pins wöchentlich aktuell (ein gesammelter PR). Beim Aktualisieren immer SHA *und* Versionskommentar zusammen ändern.
+**Actions are pinned to commit SHAs.** Every `uses:` line in `.github/workflows/` references a 40-character commit SHA instead of a tag (`@v4`), with the version as a trailing comment. A tag is a movable pointer and can be repointed; a SHA cannot. Since the release workflow builds the plugin ZIP **and** the SHA256 checksum the auto-updater trusts, a compromised action would ship a tampered ZIP together with a matching checksum — the checksum secures the transport, the pinning secures the build. `.github/dependabot.yml` keeps the pins current weekly in one combined PR; when updating, always change the SHA *and* the version comment together.
 
-**CI & Dependabot-Auto-Merge.** Zwei zusätzliche Workflows:
+**CI** (`.github/workflows/ci.yml`) runs on every pull request *and* on every push to `main` — a required status check only covers pull requests, so a direct push with bypass rights would otherwise skip the checks entirely. It runs `php -l` over all PHP files; flags invalid named arguments to internal PHP functions (catches `sprintf(format:, values:)` → `ArgumentCountError`, which `php -l` does not see); validates the YAML of every `.github` file; asserts every action is pinned to a 40-character commit SHA; and executes `tests/test-*.php` where present.
 
-- `.github/workflows/ci.yml` — läuft auf jedem `pull_request`. Prüft: `php -l` über alle PHP-Dateien; ungültige benannte Argumente an internen PHP-Funktionen (fängt die Klasse `sprintf(format:, values:)` → `ArgumentCountError`, die `php -l` nicht sieht); YAML-Validität aller `.github`-Dateien; und dass jede Action auf einem 40-stelligen Commit-SHA gepinnt ist (beide YAML-Formen, `uses:` und `- uses:`).
-- `.github/workflows/dependabot-auto-merge.yml` — merged Dependabot-PRs automatisch, aber nur `semver-patch` und `semver-minor`. Major-Updates bekommen stattdessen einen Kommentar und bleiben manuell. Greift nur bei PRs von `dependabot[bot]` aus diesem Repo, nie aus Forks.
-
-> **Zwei Repo-Einstellungen sind Voraussetzung, sonst ist der Auto-Merge wirkungslos oder gefährlich:**
-> 1. **„Allow auto-merge"** muss in den Repo-Settings aktiv sein.
-> 2. Der Branch-Schutz muss den CI-Job als **Required status check** führen (`CI / Lint & Guards`). Fehlt das, merged `gh pr merge --auto` **sofort** — es gibt dann nichts, worauf es warten müsste, und die CI wäre reine Dekoration.
-
-Zusammen mit `cooldown: default-days: 7` in der `dependabot.yml` heißt das: kein Action-Release wird in seiner ersten Woche übernommen, patch/minor laufen danach automatisch durch (sofern CI grün), major bleibt eine bewusste Entscheidung.
-
+**Dependabot auto-merge** (`.github/workflows/dependabot-auto-merge.yml`) merges only `semver-patch` and `semver-minor`, and only PRs from `dependabot[bot]` in this repo — never from forks. Major updates get a comment and stay manual. Two repo settings are prerequisites, otherwise this is useless or outright dangerous: "Allow auto-merge" must be enabled, and branch protection must list `CI / Lint & Guards` as a **required status check** — without it `gh pr merge --auto` merges *immediately*, since there is nothing left to wait for. Together with `cooldown: default-days: 7` no action release is adopted during its first week.
 
 Triggered by **pushing a `v*` tag** (`.github/workflows/release.yml`). The workflow creates the GitHub release itself — no manual "Publish release" step needed. Pipeline: setup PHP 8.3 + Python + Pandoc + GraphViz → extract README metadata → build slug-named ZIP → SHA256 → upload ZIP + `.sha256` → generate `plugin_<slug>.json` manifest → generate PHPDoc → deploy manifest/HTML/docs to `gh-pages`.
 

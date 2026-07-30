@@ -3,7 +3,7 @@
 **Plugin Name:** JPKCom FA inline SVG shortcode  
 **Plugin URI:** https://github.com/JPKCom/jpkcom-fa-svg-plugin  
 **Description:** A plugin for loading inline SVGs from Font Awesome (Pro) v5.15.4 using a shortcode  
-**Version:** 2.0.14  
+**Version:** 2.0.15  
 **Author:** Jean Pierre Kolb <jpk@jpkc.com>  
 **Author URI:** https://www.jpkc.com/  
 **Contributors:** JPKCom  
@@ -12,7 +12,7 @@
 **Tested up to:** 7.1  
 **Requires PHP:** 8.3  
 **Network:** true  
-**Stable tag:** 2.0.14  
+**Stable tag:** 2.0.15  
 **License:** GPL-2.0-or-later  
 **License URI:** https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,11 @@ echo do_shortcode( '[jsvg type="fas" name="snowboarding" class="fa-4x fa-rotate-
 
 
 ## Changelog
+
+### 2.0.15
+* Changed: the update manifest generator now defaults a missing `Network:` header to false instead of true, matching WordPress' own default. No change for this plugin, which declares `Network: true` explicitly
+* CI: the lint and guard workflow now also runs on pushes to `main`. It only covered pull requests, so a direct push with bypass rights skipped every check
+* Changed: comments, workflow step names and CI output across the repository are now English throughout, and the developer notes in `CLAUDE.md` were translated and trimmed. No effect on the shipped plugin
 
 ### 2.0.14
 * Changed: `Tested up to` raised to WordPress 7.1
