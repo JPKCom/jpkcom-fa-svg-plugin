@@ -3,7 +3,7 @@
 **Plugin Name:** JPKCom FA inline SVG shortcode  
 **Plugin URI:** https://github.com/JPKCom/jpkcom-fa-svg-plugin  
 **Description:** A plugin for loading inline SVGs from Font Awesome (Pro) v5.15.4 using a shortcode  
-**Version:** 2.0.15  
+**Version:** 2.0.16  
 **Author:** Jean Pierre Kolb <jpk@jpkc.com>  
 **Author URI:** https://www.jpkc.com/  
 **Contributors:** JPKCom  
@@ -12,7 +12,7 @@
 **Tested up to:** 7.1  
 **Requires PHP:** 8.3  
 **Network:** true  
-**Stable tag:** 2.0.15  
+**Stable tag:** 2.0.16  
 **License:** GPL-2.0-or-later  
 **License URI:** https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,16 @@ echo do_shortcode( '[jsvg type="fas" name="snowboarding" class="fa-4x fa-rotate-
 
 
 ## Changelog
+
+### 2.0.16
+* Fixed: the shortcode callback was the only function in the plugin without a vendor prefix and without a `function_exists()` guard — a global `jsvg_code()`. Any theme or plugin declaring that name caused a fatal redeclare error on load. Renamed to `jpkcom_fasvg_shortcode()` and guarded like every other function here; `jsvg_code()` remains as a deprecated shim so code calling it directly keeps working
+* Fixed: the upload path and URL were resolved once while the plugin file was being included. The plugin is `Network: true`, and on multisite each site has its own upload directory, so the captured value kept pointing at whichever site was active at load time — wrong for anything rendered after `switch_to_blog()`. The shortcode and the stylesheet registration now go through `jpkcom_fasvg_path()` / `jpkcom_fasvg_url()`, which resolve per call. `JPKCOM_FASVG_PATH` and `JPKCOM_FASVG_URL` stay for backwards compatibility
+* Changed: those helpers use `wp_get_upload_dir()` instead of `wp_upload_dir()`, i.e. the variant that does not try to create the directory — reading icons never needed that side effect, which the load-time call performed on every request
+* Fixed: the `<title>` id now comes from `wp_unique_id()` instead of `wp_rand( 10, 500000 )`. With a few dozen titled icons on one page a collision was unlikely but possible, and a duplicate id silently breaks `aria-labelledby` and is invalid HTML
+* Changed: the `<title>` text is escaped with `esc_html()` rather than `esc_attr()`. Both produce identical output in WordPress, so this changes nothing visible — it uses the helper that matches the context
+* Changed: all five `JPKCOM_FASVG_*` constants are now `defined()`-guarded; four of them were not, so a stray second copy of the file raised "constant already defined" warnings
+* Added: `tests/test-hooks.php` — 26 cases, 5 red against 2.0.15, including five path-traversal attempts asserting no file outside the icon folder can be read. CI runs it on every pull request and push to `main`
+* Note: path traversal was already closed before this release and remains so. `basename()` plus `sanitize_file_name()` reduce `name` to a flat string, `.svg` is always appended, and `type` is whitelisted — verified against inputs such as `../../../../etc/passwd`, `solid/../../wp-config`, `..` and an embedded null byte
 
 ### 2.0.15
 * Changed: the update manifest generator now defaults a missing `Network:` header to false instead of true, matching WordPress' own default. No change for this plugin, which declares `Network: true` explicitly

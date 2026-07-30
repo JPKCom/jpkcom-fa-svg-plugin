@@ -78,13 +78,33 @@ Search.appendIndex(
         },                {
             "fqsen": "\\JPKCOM_FASVG_PLUGIN_PATH",
             "name": "JPKCOM_FASVG_PLUGIN_PATH",
-            "summary": "Plugin\u0020path,\u0020URL\u0020and\u0020Font\u0020Awesome\u0020upload\u0020directory\u0020constants.",
+            "summary": "",
             "url": "namespaces/default.html#constant_JPKCOM_FASVG_PLUGIN_PATH"
         },                {
             "fqsen": "\\JPKCOM_FASVG_PLUGIN_URL",
             "name": "JPKCOM_FASVG_PLUGIN_URL",
             "summary": "",
             "url": "namespaces/default.html#constant_JPKCOM_FASVG_PLUGIN_URL"
+        },                {
+            "fqsen": "\\JPKCOM_FASVG_PATH",
+            "name": "JPKCOM_FASVG_PATH",
+            "summary": "",
+            "url": "namespaces/default.html#constant_JPKCOM_FASVG_PATH"
+        },                {
+            "fqsen": "\\JPKCOM_FASVG_URL",
+            "name": "JPKCOM_FASVG_URL",
+            "summary": "",
+            "url": "namespaces/default.html#constant_JPKCOM_FASVG_URL"
+        },                {
+            "fqsen": "\\jpkcom_fasvg_path\u0028\u0029",
+            "name": "jpkcom_fasvg_path",
+            "summary": "Filesystem\u0020base\u0020for\u0020the\u0020Font\u0020Awesome\u0020CSS\u0020and\u0020SVGs.",
+            "url": "namespaces/default.html#function_jpkcom_fasvg_path"
+        },                {
+            "fqsen": "\\jpkcom_fasvg_url\u0028\u0029",
+            "name": "jpkcom_fasvg_url",
+            "summary": "URL\u0020base\u0020for\u0020the\u0020Font\u0020Awesome\u0020CSS\u0020and\u0020SVGs.",
+            "url": "namespaces/default.html#function_jpkcom_fasvg_url"
         },                {
             "fqsen": "\\jpkcom_fasvg_register_style\u0028\u0029",
             "name": "jpkcom_fasvg_register_style",
@@ -106,9 +126,14 @@ Search.appendIndex(
             "summary": "",
             "url": "namespaces/default.html#function_jpkcom_fasvg_navigation_fa"
         },                {
+            "fqsen": "\\jpkcom_fasvg_shortcode\u0028\u0029",
+            "name": "jpkcom_fasvg_shortcode",
+            "summary": "Render\u0020the\u0020\u005Bjsvg\u005D\u0020shortcode\u0020as\u0020an\u0020inline\u0020Font\u0020Awesome\u0020SVG.",
+            "url": "namespaces/default.html#function_jpkcom_fasvg_shortcode"
+        },                {
             "fqsen": "\\jsvg_code\u0028\u0029",
             "name": "jsvg_code",
-            "summary": "Render\u0020the\u0020\u005Bjsvg\u005D\u0020shortcode\u0020as\u0020an\u0020inline\u0020Font\u0020Awesome\u0020SVG.",
+            "summary": "Deprecated\u0020alias\u0020of\u0020\u007B\u0040see\u0020jpkcom_fasvg_shortcode\u0028\u0029\u007D.",
             "url": "namespaces/default.html#function_jsvg_code"
         },                {
             "fqsen": "\\",
