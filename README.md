@@ -3,7 +3,7 @@
 **Plugin Name:** JPKCom FA inline SVG shortcode  
 **Plugin URI:** https://github.com/JPKCom/jpkcom-fa-svg-plugin  
 **Description:** A plugin for loading inline SVGs from Font Awesome (Pro) v5.15.4 using a shortcode  
-**Version:** 2.0.17  
+**Version:** 2.0.18  
 **Author:** Jean Pierre Kolb <jpk@jpkc.com>  
 **Author URI:** https://www.jpkc.com/  
 **Contributors:** JPKCom  
@@ -12,7 +12,7 @@
 **Tested up to:** 7.1  
 **Requires PHP:** 8.3  
 **Network:** true  
-**Stable tag:** 2.0.17  
+**Stable tag:** 2.0.18  
 **License:** GPL-2.0-or-later  
 **License URI:** https://www.gnu.org/licenses/gpl-2.0.html  
 **Update URI:** https://github.com/JPKCom/jpkcom-fa-svg-plugin
@@ -72,6 +72,9 @@ echo do_shortcode( '[jsvg type="fas" name="snowboarding" class="fa-4x fa-rotate-
 
 
 ## Changelog
+
+### 2.0.18
+* Added: a plugin icon. The update manifest now points WordPress to the JPKCom logo, so the Updates screen (Dashboard → Updates) shows it next to this plugin instead of the generic pattern wordpress.org generates from the slug
 
 ### 2.0.17
 * Security: the plugin header now carries `Update URI: https://github.com/JPKCom/jpkcom-fa-svg-plugin`. Without it, WordPress also asks wordpress.org for updates under this plugin's slug, so a same-named plugin published there with a higher version would be offered as an update of this one. With the header, wordpress.org answers nothing for this plugin and updates come only from this repository
